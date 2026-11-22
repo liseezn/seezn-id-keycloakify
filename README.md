@@ -1,58 +1,64 @@
-<p align="center">
-    <i>🚀 <a href="https://keycloakify.dev">Keycloakify</a> v11 starter 🚀</i>
-    <br/>
-    <br/>
-</p>
+# SeeZn ID — Keycloakify Theme
 
-# Quick start
+SeeZn ID is a branded Keycloak login theme built on the official Keycloakify 11 starter.
+
+## Stack
+
+- React 18, TypeScript 5, Vite 5
+- Keycloakify 11
+- Official Keycloak authentication flows (no custom authentication API)
+
+## Local development
 
 ```bash
-git clone https://github.com/keycloakify/keycloakify-starter
-cd keycloakify-starter
-yarn install # Or use an other package manager, just be sure to delete the yarn.lock if you use another package manager.
+npm install
+npm run dev
 ```
 
-# Testing the theme locally
+For local page previews, use the mock contexts in `src/login/KcPageStory.tsx` and the Keycloakify testing documentation: https://docs.keycloakify.dev/testing-your-theme
 
-[Documentation](https://docs.keycloakify.dev/testing-your-theme)
+## Build
 
-# How to customize the theme
-
-[Documentation](https://docs.keycloakify.dev/css-customization)
-
-# Building the theme
-
-You need to have [Maven](https://maven.apache.org/) installed to build the theme (Maven >= 3.1.1, Java >= 7).  
-The `mvn` command must be in the $PATH.
-
--   On macOS: `brew install maven`
--   On Debian/Ubuntu: `sudo apt-get install maven`
--   On Windows: `choco install openjdk` and `choco install maven` (Or download from [here](https://maven.apache.org/download.cgi))
+Requires Node.js 20+ and Maven (Java runtime required by Maven).
 
 ```bash
 npm run build-keycloak-theme
 ```
 
-Note that by default Keycloakify generates multiple .jar files for different versions of Keycloak.  
-You can customize this behavior, see documentation [here](https://docs.keycloakify.dev/features/compiler-options/keycloakversiontargets).
+The generated theme JAR is written to `dist_keycloak/`.
 
-# Initializing the account theme
+## Included theme behavior
 
-```bash
-npx keycloakify initialize-account-theme
-```
+- SeeZn ID wordmark and compact, responsive login layout
+- Light/dark appearance follows the operating system preference
+- Keycloak's built-in page handling for login, registration, password reset, email verification, OTP and other configured authentication challenges
+- Keycloak's built-in identity-provider buttons (only providers enabled in the realm are shown)
+- Keycloak locale selector; English and Simplified Chinese must be enabled in the realm
+- Shared Terms and Privacy links:
+  - https://auth.liseezn.top/terms.html
+  - https://auth.liseezn.top/privacy.html
 
-# Initializing the email theme
+## Realm configuration required
 
-```bash
-npx keycloakify initialize-email-theme
-```
+The theme changes presentation, not realm security settings. To enable the corresponding flows, configure them in the `seezn` realm:
 
-# GitHub Actions
+1. Set the Login theme to the generated SeeZn ID theme.
+2. Enable user registration if public registration is intended.
+3. Enable email verification and configure SMTP delivery.
+4. Enable Forgot password and configure SMTP delivery.
+5. Configure OTP / WebAuthn required actions and authentication policies as desired.
+6. Configure Google (and any other identity providers) in Identity Providers.
+7. Enable `en` and `zh-CN` under realm localization and set the default locale.
+8. Verify the realm's supported locales and email templates separately.
 
-The starter comes with a generic GitHub Actions workflow that builds the theme and publishes
-the jars [as GitHub releases artifacts](https://github.com/keycloakify/keycloakify-starter/releases/tag/v10.0.0).  
-To release a new version **just update the `package.json` version and push**.
+Do not enable a provider button until its provider credentials and redirect configuration are complete.
 
-To enable the workflow go to your fork of this repository on GitHub then navigate to:
-`Settings` > `Actions` > `Workflow permissions`, select `Read and write permissions`.
+## CI and releases
+
+GitHub Actions runs `npm run build-keycloak-theme` for pushes and pull requests to `main`. The starter release workflow publishes a JAR when the package version is incremented and pushed to `main`.
+
+Before creating a release, verify the workflow run and attached JAR artifact. Production deployment to the existing Keycloak instance is a separate, manually approved step.
+
+## Legal pages
+
+The login theme links to the separately hosted SeeZn ID Terms and Privacy pages. The theme does not copy or rewrite those legal documents.
