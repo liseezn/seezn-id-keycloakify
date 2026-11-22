@@ -42,10 +42,21 @@ body {
   text-align: center;
 }
 #kc-header-wrapper::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin: 0 9px 2px 0;
+  border-radius: 50%;
+  background: var(--sz-text);
+  vertical-align: middle;
+}
+#kc-header-wrapper::after {
   content: "SeeZn ID";
   display: inline-block;
   font-size: 23px;
   line-height: 1.4;
+  vertical-align: middle;
 }
 .login-pf-page, .pf-v5-c-login, #kc-content, #kc-content-wrapper {
   background: transparent !important;
