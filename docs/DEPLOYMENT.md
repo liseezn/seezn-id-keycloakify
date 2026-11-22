@@ -80,7 +80,7 @@ unzip -p dist_keycloak/keycloak-theme-for-kc-all-other-versions.jar \
 ```json
 {
   "themes": [
-    { "name": "seezn-id", "types": ["login"] }
+    { "name": "seezn-id", "types": ["login", "account"] }
   ]
 }
 ```
@@ -269,6 +269,7 @@ docker compose -f docker/docker-compose.yml up -d
 | --- | --- |
 | realm / displayName | `seezn` / `SeeZn ID` |
 | loginTheme | `seezn-id` |
+| accountTheme | `seezn-id` |
 | 国际化 | 开启；`supportedLocales=["en","zh-CN"]`，`defaultLocale=en` |
 | 注册/找回/记住我/邮箱验证 | 全部开启 |
 | 邮箱登录 / 重复邮箱 / 改用户名 | `true` / `false` / `false` |
@@ -277,22 +278,22 @@ docker compose -f docker/docker-compose.yml up -d
 | 重定向 URI | `https://liseezn.top/*`、`http://localhost:3000/*` |
 | Google IdP | alias `google`，占位 client id/secret，`syncMode=IMPORT` |
 
-### 6.1 激活/确认登录主题
+### 6.1 激活/确认登录主题与账号主题
 
 Admin Console：`https://auth.liseezn.top/admin/` → 选择 realm **seezn** →
-**Realm settings → Themes → Login theme** → 选择 **seezn-id** → Save。
+**Realm settings → Themes → Login theme** 与 **Account theme** 都选择 **seezn-id** → Save。
 
-导入的 realm 已把 `loginTheme` 设为 `seezn-id`，这一步用于确认主题确实出现在下拉框中。
-若下拉框没有 `seezn-id`，说明 JAR 未被发现或注册名不对，见 §15.1。
+导入的 realm 已把 `loginTheme` 与 `accountTheme` 设为 `seezn-id`，这一步用于确认两个下拉框都能看到 `seezn-id`。
+若下拉框没有 `seezn-id`，说明 JAR 未被发现或注册名/type 不对，见 §15.1。
 
 用 kcadm 验证：
 
 ```bash
 kcadm.sh config credentials --server https://auth.liseezn.top --realm master \
   --user "$KC_ADMIN_USERNAME"
-kcadm.sh get realms/seezn -F loginTheme
-# 期望: {"loginTheme" : "seezn-id"}
-kcadm.sh update realms/seezn -m -s loginTheme=seezn-id   # 幂等重设
+kcadm.sh get realms/seezn -F loginTheme -F accountTheme
+# 期望: loginTheme 与 accountTheme 均为 "seezn-id"
+kcadm.sh update realms/seezn -m -s loginTheme=seezn-id -s accountTheme=seezn-id   # 幂等重设
 ```
 
 ### 6.2 主题生效检查
@@ -686,7 +687,7 @@ SITE_URL=http://127.0.0.1:8080 AUTH_URL=http://127.0.0.1:8099 \
 | 启动时导入 | `start-dev --import-realm`（空库） | 退出码 0；`Realm 'seezn' imported`，创建 bootstrap admin |
 | 既有 realm 重导 | 再次启动 `--import-realm` | `Realm 'seezn' already exists. Import skipped`（IGNORE_EXISTING） |
 | 强制覆盖导入 | `kc.sh import --file ... --override=true`（既有库） | 退出码 0；日志 `Removing it before import`，即删除并重建 realm（用户数据会丢失） |
-| Realm 字段 | Admin REST `GET /admin/realms/seezn` | loginTheme、locales、注册/邮箱开关、`length(8)`、SMTP map 全部与 JSON 一致 |
+| Realm 字段 | Admin REST `GET /admin/realms/seezn` | loginTheme、accountTheme、locales、注册/邮箱开关、`length(8)`、SMTP map 全部与 JSON 一致 |
 | OIDC 客户端 | `GET .../clients?clientId=seezn-portal` | publicClient、standardFlow、两条 redirectUris、对应 webOrigins |
 | Google IdP | `GET .../identity-provider/instances` | alias/providerId=google、enabled、trustEmail、`defaultScope=openid email profile`、`syncMode=IMPORT`、clientSecret 被掩码 |
 | first broker login | `GET .../authentication/flows` | 内置 flow 存在，IdP 引用有效 |
@@ -719,7 +720,7 @@ SITE_URL=http://127.0.0.1:8080 AUTH_URL=http://127.0.0.1:8099 \
 2. JAR 注册名是否 `seezn-id`：
    `docker compose exec keycloak unzip -p /opt/keycloak/providers/seezn-id-theme.jar META-INF/keycloak-themes.json`
    （镜像内可能没有 `unzip`，也可构建前在宿主机检查）；
-3. Realm 的 `loginTheme` 是否 `seezn-id`（§6.1）；
+3. Realm 的 `loginTheme` / `accountTheme` 是否 `seezn-id`（§6.1）；
 4. 是否用了 22-to-25 JAR 却跑 Keycloak 26（用 all-other-versions）；
 5. 更新 JAR 后是否 `--force-recreate`（restart 不会换镜像层），并清浏览器缓存；
 6. 查看 `docker compose logs keycloak | grep -i theme`。

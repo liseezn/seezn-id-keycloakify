@@ -1,0 +1,428 @@
+@import "../../public-site/assets/tokens.css";
+
+/* ==========================================================================
+   SeeZn ID — account center shell
+   Replaces the default PatternFly page with a lighter top navigation.
+   Upstream account pages and API calls are untouched.
+   ========================================================================== */
+
+:root {
+    --pf-v5-global--FontFamily--text: var(--sz-font);
+    --pf-v5-global--FontFamily--heading--font-family: var(--sz-font);
+    --pf-v5-global--primary-color--100: var(--sz-accent);
+    --pf-v5-global--primary-color--200: var(--sz-accent-strong);
+    --pf-v5-global--link--Color: var(--sz-accent);
+    --pf-v5-global--link--Color--hover: var(--sz-accent-strong);
+    --pf-v5-global--BackgroundColor--100: var(--sz-bg);
+    --pf-v5-global--BackgroundColor--200: var(--sz-muted-bg);
+    --pf-v5-global--Color--100: var(--sz-text);
+    --pf-v5-global--Color--200: var(--sz-muted);
+    --pf-v5-global--Color--300: var(--sz-muted);
+    --pf-v5-global--BorderColor--100: var(--sz-border);
+    --pf-v5-global--BorderColor--200: var(--sz-border);
+    --pf-v5-global--BorderRadius--sm: 8px;
+    --pf-v5-global--BorderRadius--lg: 12px;
+    --pf-v5-global--danger-color--100: var(--sz-danger);
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+    background: var(--sz-bg);
+    color: var(--sz-text);
+    font-family: var(--sz-font);
+}
+
+body {
+    margin: 0;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- shell ---------- */
+
+.sz-account-shell {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background: var(--sz-bg);
+}
+
+.sz-account-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.sz-account-header .pf-v5-c-masthead {
+    min-height: 60px;
+    border-bottom: 1px solid var(--sz-border);
+    background: color-mix(in srgb, var(--sz-bg) 82%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+}
+
+.sz-account-header .pf-v5-c-masthead__brand {
+    padding-block: 10px;
+}
+
+.sz-account-header .pf-v5-c-masthead__brand img {
+    height: 28px;
+    width: auto;
+}
+
+/* ---------- horizontal navigation ---------- */
+
+.sz-account-nav {
+    position: sticky;
+    top: 60px;
+    z-index: 29;
+    border-bottom: 1px solid var(--sz-border);
+    background: color-mix(in srgb, var(--sz-bg) 82%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+}
+
+.sz-account-nav-inner {
+    display: flex;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 8px 24px;
+    align-items: center;
+    gap: 8px;
+}
+
+.sz-account-nav-toggle {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid var(--sz-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sz-text);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.sz-account-nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sz-account-nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sz-muted);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.sz-account-nav-item:hover {
+    border-color: var(--sz-border);
+    color: var(--sz-text);
+    text-decoration: none;
+}
+
+.sz-account-nav-item.is-active {
+    border-color: var(--sz-border);
+    background: var(--sz-muted-bg);
+    color: var(--sz-text);
+}
+
+.sz-account-nav-item:focus-visible,
+.sz-account-nav-toggle:focus-visible {
+    outline: 2px solid var(--sz-accent);
+    outline-offset: 2px;
+}
+
+.sz-account-nav-group {
+    position: relative;
+}
+
+.sz-account-nav-chevron {
+    transition: transform 0.15s ease;
+}
+
+.sz-account-nav-group.is-open .sz-account-nav-chevron {
+    transform: rotate(180deg);
+}
+
+.sz-account-nav-submenu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 220px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border: 1px solid var(--sz-border);
+    border-radius: 12px;
+    background: var(--sz-surface);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+
+.sz-account-nav-group.is-open .sz-account-nav-submenu {
+    display: block;
+}
+
+.sz-account-nav-submenu .sz-account-nav-item {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: 8px;
+}
+
+/* ---------- main content ---------- */
+
+.sz-account-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 56px;
+}
+
+.sz-account-main .pf-v5-c-page__main-section {
+    padding: 0;
+    background: transparent;
+}
+
+.sz-account-main .pf-v5-c-page__main-section + .pf-v5-c-page__main-section {
+    margin-top: 24px;
+}
+
+.sz-account-main h1,
+.sz-account-main .pf-v5-c-title {
+    color: var(--sz-text);
+    font-family: var(--sz-font);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+.sz-account-main h1 {
+    font-size: 1.75rem;
+}
+
+.sz-account-main .pf-v5-c-content,
+.sz-account-main .pf-v5-c-text {
+    color: var(--sz-body);
+}
+
+/* ---------- PatternFly component polish ---------- */
+
+.pf-v5-c-card {
+    border: 1px solid var(--sz-border);
+    border-radius: 12px;
+    background: var(--sz-surface);
+    box-shadow: none;
+}
+
+.pf-v5-c-card__header,
+.pf-v5-c-card__body,
+.pf-v5-c-card__footer {
+    background: transparent;
+}
+
+.pf-v5-c-button {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.pf-v5-c-button.pf-m-primary {
+    border-color: var(--sz-accent);
+    background: var(--sz-accent);
+    color: #ffffff;
+}
+
+.pf-v5-c-button.pf-m-primary:hover {
+    border-color: var(--sz-accent-strong);
+    background: var(--sz-accent-strong);
+}
+
+.pf-v5-c-button.pf-m-secondary,
+.pf-v5-c-button.pf-m-tertiary {
+    border-color: var(--sz-border);
+    background: transparent;
+    color: var(--sz-text);
+}
+
+.pf-v5-c-form__label,
+.pf-v5-c-form__label-text {
+    color: var(--sz-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.pf-v5-c-form-control {
+    border-radius: 10px;
+    border-color: var(--sz-border);
+    background: transparent;
+    color: var(--sz-text);
+}
+
+.pf-v5-c-form-control:focus-within {
+    border-color: var(--sz-accent);
+}
+
+.pf-v5-c-table {
+    background: transparent;
+}
+
+.pf-v5-c-table thead tr {
+    border-bottom: 1px solid var(--sz-border);
+}
+
+.pf-v5-c-table tbody tr {
+    border-bottom: 1px solid var(--sz-border);
+}
+
+.pf-v5-c-table th {
+    color: var(--sz-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.pf-v5-c-nav {
+    --pf-v5-c-nav__link--FontSize: 0.9375rem;
+}
+
+.pf-v5-c-alert {
+    border-radius: 10px;
+}
+
+.pf-v5-c-tabs {
+    --pf-v5-c-tabs__link--FontSize: 0.9375rem;
+}
+
+/* ---------- footer ---------- */
+
+.sz-account-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 32px 24px 40px;
+    border-top: 1px solid var(--sz-border);
+    color: var(--sz-muted);
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.sz-account-footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 20px;
+}
+
+.sz-account-footer a {
+    color: var(--sz-muted);
+    text-decoration: none;
+}
+
+.sz-account-footer a:hover {
+    color: var(--sz-text);
+    text-decoration: underline;
+}
+
+/* ---------- dark mode ---------- */
+
+.pf-v5-theme-dark {
+    --pf-v5-global--BackgroundColor--100: var(--sz-bg);
+    --pf-v5-global--BackgroundColor--200: var(--sz-muted-bg);
+    --pf-v5-global--Color--100: var(--sz-text);
+    --pf-v5-global--Color--200: var(--sz-muted);
+    --pf-v5-global--BorderColor--100: var(--sz-border);
+    --pf-v5-global--BorderColor--200: var(--sz-border);
+    --pf-v5-global--primary-color--100: var(--sz-accent);
+    --pf-v5-global--link--Color: var(--sz-accent);
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 900px) {
+    .sz-account-nav-inner {
+        flex-wrap: wrap;
+        padding: 10px 16px;
+    }
+
+    .sz-account-nav-toggle {
+        display: inline-flex;
+    }
+
+    .sz-account-nav-list {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 6px 0 4px;
+    }
+
+    .sz-account-nav-list.is-open {
+        display: flex;
+    }
+
+    .sz-account-nav-item {
+        width: 100%;
+        justify-content: flex-start;
+        border-radius: 10px;
+    }
+
+    .sz-account-nav-group .sz-account-nav-submenu {
+        position: static;
+        display: none;
+        min-width: 0;
+        margin: 2px 0 6px 12px;
+        padding: 0 0 0 12px;
+        border: 0;
+        border-left: 1px solid var(--sz-border);
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .sz-account-nav-group.is-open .sz-account-nav-submenu {
+        display: block;
+    }
+
+    .sz-account-main {
+        padding: 24px 16px 40px;
+    }
+
+    .sz-account-main h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .sz-account-header .pf-v5-c-masthead {
+        min-height: 56px;
+    }
+
+    .sz-account-nav {
+        top: 56px;
+    }
+
+    .sz-account-footer {
+        padding: 24px 16px 32px;
+    }
+}

@@ -1,10 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
+import path from "node:path";
 import { clearInbox, isInboxAvailable, waitForLink } from "./mail";
 import { totp } from "./totp";
 
 const KC = process.env.KC_BASE ?? "http://127.0.0.1:8100";
 const CALLBACK = "http://localhost:3000/callback";
 const PASSWORD = "Passw0rd!123";
+const SHOTS = path.resolve(process.cwd(), "artifacts/screenshots/e2e");
 
 function authUrl() {
     const query = new URLSearchParams({
@@ -66,6 +68,25 @@ test.describe("authentication", () => {
         const url = new URL((await callback).url());
         expect(url.searchParams.get("code")).toBeTruthy();
         expect(url.searchParams.get("state")).toBeTruthy();
+    });
+
+    test("account center uses the SeeZn shell", async ({ page }) => {
+        await startLogin(page, "alice");
+        await page.goto(`${KC}/realms/seezn/account/`);
+        await expect(page).toHaveTitle(/SeeZn ID/);
+        await expect(page.locator(".pf-v5-c-masthead")).toBeVisible();
+        await expect(page.locator(".sz-account-nav")).toBeVisible();
+        await expect(page.locator(".sz-account-footer")).toContainText("2026 SeeZn ID");
+        expect(await page.locator(".sz-account-nav-item").count()).toBeGreaterThan(2);
+
+        await page.setViewportSize({ width: 390, height: 844 });
+        expect(
+            await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+        ).toBeLessThanOrEqual(0);
+        await page.screenshot({ path: `${SHOTS}/account-mobile.png`, fullPage: true });
+
+        await page.emulateMedia({ colorScheme: "dark" });
+        await page.screenshot({ path: `${SHOTS}/account-mobile-dark.png`, fullPage: true });
     });
 
     test("Google button starts the broker flow with the expected parameters", async ({ page }) => {
@@ -169,5 +190,29 @@ test.describe("authentication", () => {
         await page.goto(`${KC}/realms/seezn/protocol/openid-connect/auth?client_id=missing`);
         expect(await pageId(page)).toBe("error.ftl");
         expect((await page.locator("#kc-error-message").innerText()).length).toBeGreaterThan(10);
+    });
+});
+
+test.describe("public pages", () => {
+    const SITE = "http://127.0.0.1:5174";
+
+    test("home, terms and privacy stay intact", async ({ page }) => {
+        await page.goto(`${SITE}/`);
+        await expect(page).toHaveTitle(/SeeZn ID/);
+        await expect(page.locator(".sz-header")).toBeVisible();
+
+        await page.goto(`${SITE}/terms.html`);
+        await expect(page.locator("main h2")).toHaveCount(16);
+        await page.locator('[data-lang="zh"]').click();
+        await expect(page.locator("main h1")).toHaveText("服务条款");
+
+        await page.goto(`${SITE}/privacy.html`);
+        await expect(page.locator("main h2")).toHaveCount(16);
+        expect(await page.locator("main table").count()).toBeGreaterThanOrEqual(4);
+
+        await page.setViewportSize({ width: 390, height: 844 });
+        expect(
+            await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+        ).toBeLessThanOrEqual(0);
     });
 });

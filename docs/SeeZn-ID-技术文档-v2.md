@@ -43,12 +43,12 @@
 
 ## 1. 项目定位与非目标
 
-**定位**：交付两部分——(1) Keycloak 26 登录主题 `seezn-id`，品牌化登录、注册、找回密码、OTP、信息与错误页；(2) 同域公共站点（首页、服务条款、隐私政策）。认证协议、认证流程与安全策略完全沿用 Keycloak。
+**定位**：交付三部分——(1) Keycloak 26 登录主题 `seezn-id`，品牌化登录、注册、找回密码、OTP、信息与错误页；(2) 同域公共站点（首页、服务条款、隐私政策）；(3) 品牌化账号中心（Account Console，Single-Page），在保留全部账号功能的前提下重构前端外壳。认证协议、认证流程与安全策略完全沿用 Keycloak。
 
 **非目标**：
 
 - 不重写 Keycloak，不实现自定义认证逻辑，不新增认证 API，不改 OAuth 2.0 / OIDC / SAML 行为。
-- 不定制账户控制台与管理员控制台；`accountThemeImplementation: "none"`，账户控制台使用 Keycloak 默认主题（视觉不同属预期）。
+- 不定制管理员控制台（Admin Console）；账号中心已定制，管理员后台仍使用 Keycloak 默认主题。
 - 不承载业务应用页面，不做 CMS。
 - 不通过主题“开启”注册、邮箱验证、找回密码、MFA 或 Google 登录——这些由 Realm、SMTP、IdP 配置决定。
 - 不提供日志保留、日志轮转、数据库备份；属运维层职责。
@@ -172,6 +172,13 @@ src/
     seezn.css              # 设计系统 CSS；覆盖回退页
     components/            # AuthFooter、Fields、SocialProviders、ProviderIcons
     pages/                 # 自定义认证页（React + MUI）
+  account/                 # 账号中心（Keycloakify Account UI）
+    KcAccountUi.tsx        # 标题 + CSS 入口（自有）
+    root/{Root,Header,PageNav}.tsx  # 外壳/顶栏/横向导航（自有）
+    assets/content.ts      # 导航顺序（自有）
+    assets/logo.svg favicon.svg     # 品牌资源（自有）
+    seezn-account.css      # 外壳样式（自有）
+    （其余由 sync-extensions 生成并 git 忽略）
   shared/
     theme.ts               # 设计令牌 + MUI 主题工厂
     useColorMode.ts        # 跟随系统深浅色
@@ -253,6 +260,36 @@ dist/ dist_keycloak/       # 主题构建产物（git 忽略）；public-site �
 - `kcContext.message` 为页面级消息，由 Template 的 `displayMessage` 渲染；`messagesPerField` 为字段级错误，可用 `existsError`/`get`/`getFirstError`/`printIfExists`。按字段原样渲染，不改语义；存在字段错误时关闭全局消息避免重复。
 - 消息按 `kcSanitize` 语义处理；React 默认转义，禁止 `dangerouslySetInnerHTML`。登录失败、找回密码提示不得引入账号枚举。
 - 只渲染 `kcContext.social.providers`（Realm 实际启用的 IdP），`href` 用 `provider.loginUrl`；已知平台用品牌图标，未知 alias 用显示名首字母徽标。Realm 不允许密码登录时不显示密码表单与注册入口。
+
+### 6.4 账号中心主题（Account Console）
+
+账号中心使用 Keycloakify 官方 `@keycloakify/keycloak-account-ui` 扩展重建为 SeeZn 品牌单页应用，在**前端外壳层级**调整布局与导航，不改账号业务 API。
+
+**生成与自有文件**
+
+- `src/account/**` 大部分由 `keycloakify sync-extensions` 生成，默认 git 忽略；`npm ci` 的 `postinstall` 会重新生成。
+- 通过 `npx keycloakify own --path "account/..."` 认领的文件才进入仓库：
+  - `KcAccountUi.tsx`（标题、样式入口）、`root/Root.tsx`（外壳布局）、`root/Header.tsx`（品牌顶栏）、`root/PageNav.tsx`（横向导航）、`assets/content.ts`（入口顺序）、`assets/logo.svg` / `favicon.svg`（品牌资源）、`root/header.module.css`。
+  - `seezn-account.css`（自有新增）负责 PatternFly 变量与外壳组件样式，`@import` 公共站点的 `tokens.css`。
+- 升级扩展：更新 `@keycloakify/keycloak-account-ui` 版本 → `npm install`（自动 sync）→ 重新构建；自有文件即使被上游更新也不会覆盖。
+
+**外壳设计**
+
+- 顶部品牌栏（SeeZn logo + 账号菜单/登出/referrer）替代默认双层顶栏。
+- 默认左侧栏改为一行横向导航：个人资料、应用、安全（下拉：登录与密码/设备活动/已关联账户）、群组、组织、资源、可验证凭证；功能入口位置相对默认有调整。
+- 内容区最大宽度 1120px，卡片圆角、细边框、轻阴影；移动端汉堡菜单，无横向滚动；深浅色跟随系统与 Realm Dark Mode 开关。
+- 页面内部（个人资料表单、凭据、设备、应用列表等）复用上游组件，仅通过全局外壳 CSS 统一视觉。
+
+**构建与选择**
+
+- `vite.config.ts`：`accountThemeImplementation: "Single-Page"`；JAR 内 `seezn-id` 的 types 为 `login` + `account`。
+- Realm `seezn` → Realm Settings → Themes → **Account theme** 选择 `seezn-id`；realm 导入 JSON 已设置 `accountTheme`。
+- 账号主题使用独立前端 bundle，不影响登录主题与公共三页；JAR 体积与构建时间会比纯登录主题大。
+
+**限制**
+
+- 上游扩展 UI 版本为 Keycloak 26.7 系（`260700.x`），服务端为 26.8.2；需在 staging 实测账号中心，异常时固定扩展版本或回退 Keycloak 补丁版本。
+- 账号页面内部布局仍受上游升级影响；自定义仅限外壳与样式，避免长期维护整份上游源码。
 
 ## 7. 国际化
 
@@ -364,7 +401,7 @@ unzip -p dist_keycloak/keycloak-theme-for-kc-all-other-versions.jar \
 ```
 
 ```json
-{ "themes": [ { "name": "seezn-id", "types": ["login"] } ] }
+{ "themes": [ { "name": "seezn-id", "types": ["login", "account"] } ] }
 ```
 
 主题名来自 `vite.config.ts` 的 `themeName`；当前 JAR 与 `kc.gen.tsx` 已一致。若修改主题名，必须重新构建并再次核对，不能只改 Realm。
@@ -470,7 +507,7 @@ Keycloak **没有**统一的 90 天日志保留策略；隐私政策承诺必须
 
 **未实测不得标记通过**。验收报告须附命令、时间、版本、截图/录屏、日志路径；测试对象是“主题 + 站点 + Realm 配置”整体；重点验证回退 `DefaultPage` 的流程仍可完成认证。
 
-V2.0 起，断言型 Playwright 套件已落在 `tests/e2e/`（`auth.spec.ts`、`site.spec.ts`，含 TOTP 计算、Mock SMTP 取信、OAuth 回调断言），覆盖率见 `docs/ACCEPTANCE.md` 的 T01–T13；执行入口为手动触发的 `.github/workflows/acceptance.yml` 或 staging Docker，执行结果以 artifact 为准。下表“状态”在 CI 首次通过前保持“待验证”。
+V2.0 起，断言型 Playwright 套件已落在 `tests/e2e/acceptance.spec.ts`（含 TOTP 计算、Mock SMTP 取信、OAuth 回调、账号中心与公共页断言），覆盖率见 `docs/ACCEPTANCE.md` 的 T01–T13；执行入口为手动触发的 `.github/workflows/acceptance.yml` 或 staging Docker，执行结果以 artifact 为准。下表“状态”在 CI 首次通过前保持“待验证”。
 
 ### 11.2 测试矩阵
 
@@ -487,7 +524,7 @@ V2.0 起，断言型 Playwright 套件已落在 `tests/e2e/`（`auth.spec.ts`、
 | T09 | 安全头 | `curl -I` 443 | HSTS 等头符合预期 | CI 待执行 |
 | T10 | 原功能不回归 | Passkey、IdP 关联、更新资料、注销 | 回退页面可用，流程不中断 | CI 待执行 |
 | T11 | 构建产物 | `npm ci`、lint、typecheck、build-keycloak-theme | 全部成功；JAR 注册名 `seezn-id`；`public-site/` 三页存在 | CI 待执行 |
-| T12 | 账户控制台 | 访问 `/realms/seezn/account/` | 未登录跳登录，登录后可管理（默认主题） | CI 待执行 |
+| T12 | 账号中心 | 登录后访问 `/realms/seezn/account/` | SeeZn 品牌外壳、横向导航、功能可用、移动端/暗色正常 | CI 待执行 |
 | T13 | 公共站点三页 | Playwright 打开 `/`、`/terms.html`、`/privacy.html` | 无需登录、16 章齐全、语言/暗色/移动端无溢出 | CI 待执行 |
 
 ### 11.3 执行环境与证据
@@ -636,7 +673,7 @@ curl -fsS http://127.0.0.1:9000/health/ready
 
 **Q4：收不到邮件？** 检查 Realm SMTP、发件域 SPF/DKIM/DMARC、垃圾箱；本地用 mock SMTP（1025）读取链接。
 
-**Q5：账户控制台不是 SeeZn 品牌？** 本项目未定制 Account Console（`accountThemeImplementation: "none"`），使用 Keycloak 默认主题。
+**Q5：账号中心不是 SeeZn 品牌？** 确认 `vite.config.ts` 使用 `accountThemeImplementation: "Single-Page"`，JAR 的 `types` 含 `account`，并在 Realm Settings → Themes → Account theme 选择 `seezn-id`；修改后重启并清缓存。
 
 **Q6：为什么两个 JAR？** Keycloakify 按 KC 版本范围打包；KC 26.8.2 用 `...-all-other-versions.jar`，不要同时部署。
 
@@ -670,7 +707,7 @@ curl -fsS http://127.0.0.1:9000/health/ready
 2. **Google 生产凭据**：Client ID/Secret、consent screen 审核状态、授权域名与真实回调验证结果。
 3. **SMTP 生产参数**：主机、端口、TLS、发件地址、SPF/DKIM/DMARC 与测试结果。
 4. **生产部署资产**：`docker/` 的 compose/Dockerfile/nginx、证书、服务器规格、回滚流程；补齐 `docs/DEPLOYMENT.md`。
-5. **验收证据**：Playwright 用例与 T01–T12 执行记录；未执行前不得标记通过。
+5. **验收证据**：Playwright 用例与 T01–T13 执行记录（含账号中心与公共三页）；未执行前不得标记通过。
 6. **日志保留落地**：nginx logrotate、Keycloak 事件过期、数据库备份轮换的配置与验证。
 7. **Realm 生产化**：收窄 `seezn-portal` 通配回调、替换 mock SMTP、确认初始管理员与密钥轮换。
 8. **构建与 CI**：重新构建并核对 JAR 注册名；CI 增加 `setup-java 21`、`npm ci`、产物上传。

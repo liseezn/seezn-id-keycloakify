@@ -1,6 +1,6 @@
 # SeeZn ID — 测试与验收
 
-本文件定义 SeeZn ID 主题与公共站点的验收范围、执行环境、命令和判定标准。
+本文件定义 SeeZn ID 登录主题、账号中心与公共站点的验收范围、执行环境、命令和判定标准。
 
 > **约定：验收不在开发机本地启动项目。** 认证流程依赖一次性 Keycloak、SMTP 与浏览器环境，
 > 统一在 GitHub Actions 或 staging 主机的 Docker 中执行。
@@ -9,25 +9,26 @@
 
 | 编号 | 场景 | 断言要点 | 用例位置 |
 | --- | --- | --- | --- |
-| T01 | 登录页品牌与响应式 | 品牌字标、标题、Google 按钮、页脚；1440/390 无横向滚动；无 console error | `auth.spec.ts` |
-| T02 | 错误凭据 | 保留 Keycloak 错误语义（Invalid username or password），仍停留登录页 | `auth.spec.ts` |
-| T03 | 正常登录 | OIDC 授权码回调携带 `code`/`state` | `auth.spec.ts` |
-| T04 | Google 登录发起 | 303/302 跳转 `accounts.google.com`，`redirect_uri` 为 `/realms/seezn/broker/google/endpoint`，`scope` 含 `openid email profile` | `auth.spec.ts` |
-| T05 | 中英文切换 | `kc_locale=zh-CN`，保留 `client_id`/`client_data`，标题与文案切换 | `auth.spec.ts` |
-| T06 | 找回密码 | SMTP 收到邮件 → 重置链接 → 设置新密码 → 新密码登录成功 | `auth.spec.ts` |
-| T07 | 注册 + 邮箱验证 + 首次密码 | 注册 → 邮箱验证 → 设置密码 → 登录成功 | `auth.spec.ts` |
-| T08 | MFA | CONFIGURE_TOTP 绑定（TOTP 计算）→ 二次登录 OTP 校验成功 | `auth.spec.ts` |
-| T09 | 错误页语义 | 未知 client 触发 `error.ftl`，展示 Keycloak 原始错误 | `auth.spec.ts` |
-| T10 | 公共站点首页 | 无自动跳转、登录按钮指向 `/realms/seezn/account/`、语言与暗色可用 | `public-site/index.html` + `verify-deployment.sh` |
-| T11 | 服务条款 | 中英各 16 章、生效日期、移动端无溢出 | `public-site/terms.html` + `verify-deployment.sh` |
-| T12 | 隐私政策 | 中英各 16 章、≥4 张表格、移动端无溢出 | `public-site/privacy.html` + `verify-deployment.sh` |
-| T13 | 页脚与公开访问 | 条款/隐私/联系邮箱链接可直接访问 | `verify-deployment.sh` |
+| T01 | 登录页品牌与响应式 | 品牌字标、标题、Google 按钮、页脚；1440/390 无横向滚动；无 console error | `acceptance.spec.ts` |
+| T02 | 错误凭据 | 保留 Keycloak 错误语义（Invalid username or password），仍停留登录页 | `acceptance.spec.ts` |
+| T03 | 正常登录 | OIDC 授权码回调携带 `code`/`state` | `acceptance.spec.ts` |
+| T04 | Google 登录发起 | 303/302 跳转 `accounts.google.com`，`redirect_uri` 为 `/realms/seezn/broker/google/endpoint`，`scope` 含 `openid email profile` | `acceptance.spec.ts` |
+| T05 | 中英文切换 | `kc_locale=zh-CN`，保留 `client_id`/`client_data`，标题与文案切换 | `acceptance.spec.ts` |
+| T06 | 找回密码 | SMTP 收到邮件 → 重置链接 → 设置新密码 → 新密码登录成功 | `acceptance.spec.ts` |
+| T07 | 注册 + 邮箱验证 + 首次密码 | 注册 → 邮箱验证 → 设置密码 → 登录成功 | `acceptance.spec.ts` |
+| T08 | MFA | CONFIGURE_TOTP 绑定（TOTP 计算）→ 二次登录 OTP 校验成功 | `acceptance.spec.ts` |
+| T09 | 错误页语义 | 未知 client 触发 `error.ftl`，展示 Keycloak 原始错误 | `acceptance.spec.ts` |
+| T10 | 账号中心 | 登录后访问 `/realms/seezn/account/`，断言 SeeZn 顶栏/横向导航/页脚、移动端无溢出、暗色截图 | `acceptance.spec.ts` |
+| T11 | 公共站点首页 | 无自动跳转、登录按钮指向 `/realms/seezn/account/`、语言与暗色可用 | `public-site/index.html` + `verify-deployment.sh` |
+| T12 | 服务条款 | 中英各 16 章、生效日期、移动端无溢出 | `public-site/terms.html` + `verify-deployment.sh` |
+| T13 | 隐私政策 | 中英各 16 章、≥4 张表格、移动端无溢出 | `public-site/privacy.html` + `verify-deployment.sh` |
+| T14 | 页脚与公开访问 | 条款/隐私/联系邮箱链接可直接访问 | `verify-deployment.sh` |
 
 补充检查（非 E2E）：
 
 - `npm run typecheck`：TypeScript 严格模式零错误。
 - `npm run lint`：ESLint 零 error。
-- 静态页检查：`public-site/` 三页可直接打开，`scripts/verify-deployment.sh` 检查 200 与关键文案。
+- 静态页检查：`public-site/` 三页由 Playwright 的本地静态服务器 + `scripts/verify-deployment.sh` 检查。
 - `scripts/verify-deployment.sh`：站点、OIDC discovery、主题资源、Google 跳转参数、安全响应头。
 
 ## 2. 执行方式
@@ -43,7 +44,7 @@
 - 启动 `mock-smtp.mjs`（1025，HTTP 收件箱 1026）与一次性 Keycloak 26.8.2
   （`docker run --network host ... start-dev --http-port=8100 --import-realm`，
   挂载 `keycloak/realm-seezn.json` 与构建出的 JAR）；
-- 安装 Playwright Chromium，执行 `npm run test:e2e`；
+- 启动本地静态服务器（Playwright webServer，`public-site/`）；安装 Playwright Chromium，执行 `npm run test:e2e`；
 - 上传 `artifacts/e2e-report.json`（截图仅在失败时生成在 `test-results/`）。
 
 通过 = 该手动 job 绿色且报告完整。

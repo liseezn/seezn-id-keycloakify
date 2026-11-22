@@ -10,7 +10,7 @@ export default defineConfig({
             // Registered theme name inside the JAR; also the value to pick in
             // Realm Settings → Themes → Login theme.
             themeName: "seezn-id",
-            accountThemeImplementation: "none"
+            accountThemeImplementation: "Single-Page"
         })
     ]
 });

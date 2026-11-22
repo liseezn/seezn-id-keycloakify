@@ -1,11 +1,13 @@
-# SeeZn ID — Keycloakify 登录主题与公共站点
+# SeeZn ID — Keycloakify 主题、账号中心与公共站点
 
 SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名 `https://auth.liseezn.top`）。
-本仓库包含两部分交付物：
+本仓库包含三类交付物：
 
 1. **Keycloak 登录主题**：基于 [Keycloakify 11](https://docs.keycloakify.dev/) + React 18 + TypeScript + MUI 6，
    品牌化登录、注册、找回/重置密码、邮箱验证、MFA（TOTP）、错误与信息页，保留 Keycloak 原生认证语义。
-2. **公共站点**：首页、服务条款、隐私政策，保留批准的静态 HTML 设计（`public-site/`），
+2. **账号中心主题（Account Console）**：基于 `@keycloakify/keycloak-account-ui` 的 SeeZn 品牌单页外壳，
+   顶部横向导航、卡片式内容、移动端/暗色适配；账号业务功能与 API 完全复用上游。
+3. **公共站点**：首页、服务条款、隐私政策，保留批准的静态 HTML 设计（`public-site/`），
    由 nginx 同域提供，不经过 Keycloak，也不会自动跳转登录。
 
 > React 仅作为 Keycloak 认证主题的前端外壳（Keycloakify）；公共三页是静态 HTML，不引入第二套前端应用。
@@ -34,6 +36,13 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 - 统一头部/语言/页脚：与公共站点共用 `public-site/assets/tokens.css` 设计令牌，顶栏品牌居左、语言居右，页脚统一为版权 + 首页/条款/隐私/邮箱。
 - 跟随系统深浅色；移动端优先；认证页与公共页使用同一套字体、颜色、圆角与间距。
 
+**账号中心**（`src/account/**`，Keycloakify Single-Page Account UI）
+
+- 外壳：SeeZn 品牌顶栏 + 横向导航 + 卡片内容；默认左侧栏移除，应用/安全/群组/组织等入口重新编排。
+- 功能：个人资料、登录与密码、设备活动、已关联账户、应用、群组、组织、资源、可验证凭证全部保留（受 Realm feature flag 控制）。
+- 视觉：与登录主题、公共站点共用 `public-site/assets/tokens.css`；移动端折叠菜单，深浅色跟随系统。
+- 仅有 logo、标题、外壳布局/导航、CSS 与入口顺序是自有文件；其余上游源码由 `keycloakify sync-extensions` 生成并被 git 忽略。
+
 **公共站点**（`public-site/**`）
 
 - `/`、`/terms.html`、`/privacy.html` 三个静态页面，中英双语、深浅色、响应式，内容与批准的原稿一致
@@ -45,7 +54,7 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 
 - `docker/`：compose（Postgres + Keycloak + nginx）、主题镜像、静态页镜像、安全头与反代配置。
 - `keycloak/realm-seezn.json`：Realm 导入配置（主题、语言、注册/找回/邮箱验证、SMTP、Google IdP 占位）。
-- `tests/e2e/`：精简 Playwright 验收套件（认证流程 + 移动端/暗色），在手动触发的 CI 中连接一次性 Keycloak 执行。
+- `tests/e2e/`：精简 Playwright 验收套件（认证流程 + 账号中心 + 公共三页 + 移动端/暗色），在手动触发的 CI 中连接一次性 Keycloak 执行。
 - `.github/workflows/ci.yaml`：Lint、类型检查、主题 JAR 构建、GitHub Release（默认流水线不含验收与站点构建，避免消耗 Actions 额度）。
 - `.github/workflows/acceptance.yml`：`workflow_dispatch` 手动验收（一次性 Keycloak + Mock SMTP + Playwright），按需运行。
 
@@ -65,7 +74,7 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 npm ci
 npm run typecheck
 npm run lint
-npm run build-keycloak-theme  # -> dist_keycloak/*.jar（需要 JDK 21 + Maven 3.9）
+npm run build-keycloak-theme  # -> dist_keycloak/*.jar（login + account，需要 JDK 21 + Maven 3.9）
 ```
 
 本地开发预览（可选）：
@@ -79,8 +88,8 @@ npm run dev        # Keycloak 主题前端（需 mock kcContext 或 Keycloakify 
 
 见 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) 与 [docker/README.md](docker/README.md)。要点：
 
-- 主题 JAR 放入 `/opt/keycloak/providers/`（或按 `docker/Dockerfile.keycloak` 构建镜像），
-  在 **Realm Settings → Themes → Login theme** 选择 `seezn-id`。
+- 主题 JAR 放入 `/opt/keycloak/providers/`（或按 `docker/Dockerfile.keycloak` 构建镜像）；
+  在 **Realm Settings → Themes → Login theme** 与 **Account theme** 都选择 `seezn-id`。
 - 公共站点由 nginx 提供，`/realms`、`/resources`、`/admin`、`/js` 反代到 Keycloak。
 - Google IdP 的 Client ID/Secret 只能存在于服务端；上线前运行
   `scripts/setup-google-idp.sh` 替换占位符，或暂时禁用 Google IdP。

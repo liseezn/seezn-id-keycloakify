@@ -121,6 +121,9 @@ export default async function globalSetup() {
     if (realm.loginTheme !== "seezn-id") {
         problems.push(`loginTheme is "${realm.loginTheme}", expected "seezn-id"`);
     }
+    if (realm.accountTheme !== "seezn-id") {
+        problems.push(`accountTheme is "${realm.accountTheme}", expected "seezn-id"`);
+    }
     for (const locale of ["en", "zh-CN"]) {
         if (!(realm.supportedLocales ?? []).includes(locale)) {
             problems.push(`missing supported locale ${locale}`);

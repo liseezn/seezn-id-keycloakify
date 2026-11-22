@@ -4,8 +4,12 @@
   "enabled": true,
   "sslRequired": "external",
   "loginTheme": "seezn-id",
+  "accountTheme": "seezn-id",
   "internationalizationEnabled": true,
-  "supportedLocales": ["en", "zh-CN"],
+  "supportedLocales": [
+    "en",
+    "zh-CN"
+  ],
   "defaultLocale": "en",
   "registrationAllowed": true,
   "resetPasswordAllowed": true,

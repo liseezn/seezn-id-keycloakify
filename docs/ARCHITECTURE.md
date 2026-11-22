@@ -15,9 +15,10 @@
 | 前端 | React 18 + TypeScript 5 + Vite 5 |
 | UI 库 | MUI v6（`@mui/material` + Emotion），图标 `lucide-react` |
 | 字体 | `@fontsource/inter`（自托管，400/500/600/700）；CJK 使用系统字体回退 |
-| 主题名 | `seezn-id`（Keycloak 登录主题名，JAR 内注册名） |
+| 主题名 | `seezn-id`（JAR 内注册；types = `login` + `account`） |
 | 主题版本 | `1.0.0`（package.json version 驱动） |
 | 构建产物 | `dist_keycloak/keycloak-theme-for-kc-*.jar`（Keycloakify 11 默认双 JAR） |
+| 账号中心 | Keycloakify Single-Page Account UI（`src/account/**`，外壳自有、其余上游生成） |
 | 公共站点 | `public-site/index.html`、`terms.html`、`privacy.html`（静态 HTML，nginx 直接托管） |
 
 **重要事实（V1.0 文档错误）**
@@ -27,7 +28,7 @@
 2. `/realms/seezn/account/` 是账户控制台入口，会先跳登录；它不是"登录按钮的 OIDC 入口"。
    业务应用应通过 OIDC 授权端点发起登录。公共站点按钮保留设计稿行为指向
    `/realms/seezn/account/`，并在文档中说明替代方案。
-3. 公共站点是批准的静态 HTML（`public-site/**`），由 nginx 直接托管；React 只用于 Keycloak 认证主题外壳，不另建前端应用。
+3. 公共站点是批准的静态 HTML（`public-site/**`），由 nginx 直接托管；React 只用于 Keycloak 登录主题与账号中心外壳，不另建业务前端应用。
 4. 主题 JAR 放到 `/opt/keycloak/providers/` 即可被发现（验收时实测）；目录式主题放
    `themes/`。两者不要混用。
 5. 主题只改变展示，不改变认证语义。注册/找回密码/邮箱验证/MFA/Google 均依赖 Realm 配置，
@@ -49,6 +50,16 @@ src/
     SeeZnTemplate.tsx      # 统一认证页外壳（Keycloakify Template 包装 + 页脚）
     pages/                 # 自定义认证页（MUI）
     seezn.css              # 认证页设计系统样式（覆盖 Keycloakify 默认类）
+  account/                 # 账号中心（Keycloakify Account UI）
+    KcAccountUi.tsx        # 入口：标题 + CSS（自有）
+    root/Root.tsx          # 外壳布局：顶栏 + 横向导航 + 内容（自有）
+    root/Header.tsx        # SeeZn 品牌顶栏（自有）
+    root/PageNav.tsx       # 横向导航/安全下拉/移动菜单（自有）
+    assets/content.ts      # 导航顺序与分组（自有）
+    assets/logo.svg favicon.svg  # 品牌资源（自有）
+    seezn-account.css      # 账号中心外壳样式（自有）
+    （其余 account/** 与 shared/@patternfly、shared/keycloak-ui-shared 由
+      keycloakify sync-extensions 生成并 git 忽略）
   shared/
     theme.ts               # 设计令牌 + MUI 主题工厂
     useColorMode.ts        # 跟随系统深浅色
@@ -82,6 +93,14 @@ artifacts/                 # 验收截图与报告（构建产物，git 忽略�
   自定义文案通过 `i18n.ts` 的 custom translations 与 `useSeeZnStrings(locale)` 提供。
 - **深浅色**：CSS `prefers-color-scheme` + `useColorMode()`，不提供页内手动开关（与设计稿一致）。
 - **响应式**：表单容器 `min(100% - 40px, 400px)`，移动端不出现横向滚动。
+
+### 3.1 账号中心外壳策略
+
+- 使用 `@keycloakify/keycloak-account-ui` 生成完整账号 UI；只 `own` 外壳文件（入口、Root、Header、PageNav、content、logo/favicon、CSS），业务页面与 API 原样复用。
+- 默认左侧 `PageSidebar` 移除，改为品牌顶栏 + 一行横向导航；安全项收进下拉，应用/群组/组织等入口重新排序。
+- 设计令牌复用 `public-site/assets/tokens.css`；`seezn-account.css` 覆盖 PatternFly 变量与外壳组件。
+- 账号主题在 `seezn` Realm 的 Account theme 选择 `seezn-id`；管理员后台（Admin Console）仍为默认主题，不在范围。
+- 扩展版本 `260700.x` 对应 Keycloak 26.7 UI，服务端 26.8.2 需在 staging 实测。
 
 ## 4. 公共站点策略
 
@@ -122,7 +141,8 @@ npm run test:e2e       # 验收套件（在 CI/staging 的 Docker 中执行，�
 - `tools/jdk-21`、`tools/apache-maven-3.9.9`
 - Mock SMTP 收信服务：`tests/e2e/mock-smtp.mjs`（端口 1025 / HTTP 收件箱 1026），供注册验证/找回密码读取邮件链接
 - Playwright + Chromium（`@playwright/test`，CI 使用 `npx playwright install chromium`）
-- Realm 从 `keycloak/realm-seezn.json` 导入；Google IdP 使用占位 client id 仅验证跳转参数
+- Realm 从 `keycloak/realm-seezn.json` 导入（login/account theme = `seezn-id`）；Google IdP 使用占位 client id 仅验证跳转参数
+- 账号中心验收：登录后访问 `/realms/seezn/account/`，验证 SeeZn 外壳与导航；公共三页仍由静态服务器验证
 
 ## 8. 交付边界
 
