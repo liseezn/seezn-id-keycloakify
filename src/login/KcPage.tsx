@@ -22,14 +22,10 @@ function SeeZnTemplate(props: ComponentProps<typeof Template>) {
                     <footer className="seezn-legal" aria-label="SeeZn ID legal information">
                         <span className="copyright">© 2026 SeeZn ID</span>
                         <a href="https://auth.liseezn.top/terms.html">
-                            {props.i18n.msg("termsOfService") === "termsOfService"
-                                ? "Terms of Service"
-                                : props.i18n.msg("termsOfService")}
+                            Terms of Service / 服务条款
                         </a>
                         <a href="https://auth.liseezn.top/privacy.html">
-                            {props.i18n.msg("privacyPolicy") === "privacyPolicy"
-                                ? "Privacy Policy"
-                                : props.i18n.msg("privacyPolicy")}
+                            Privacy Policy / 隐私政策
                         </a>
                     </footer>
                 </>
