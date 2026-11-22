@@ -60,6 +60,7 @@ Keycloak 与 JAR 版本必须匹配：Keycloak 固定 `quay.io/keycloak/keycloak
 
 ```bash
 ls public-site/          # index.html terms.html privacy.html favicon-32x32.png
+ls public-site/assets/   # tokens.css seezn.css seezn.js（与主题共用令牌）
 ```
 
 `public-site/` 是受版本控制的静态 HTML（原批准设计稿），**不需要构建**；
@@ -496,9 +497,7 @@ site nginx 已配置：
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `X-Frame-Options: SAMEORIGIN`
-- 静态站专用 CSP：`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
-  img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none';
-  base-uri 'self'; form-action 'self'; frame-ancestors 'self'`
+- 静态站专用 CSP：`default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'`；无 `unsafe-inline`，仅放行 Google Fonts 与 lucide CDN。
 
 CSP 只加在静态站路径（`/`、`*.html`、`/assets/`、favicon），不覆盖 Keycloak 的
 `/realms/`、`/admin/` 等代理响应；Keycloak 自己会发送 CSP。不要用站点 CSP 覆盖管理控制台，

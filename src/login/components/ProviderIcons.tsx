@@ -54,16 +54,26 @@ export function AppleIcon({ size = 18 }: IconProps) {
     );
 }
 
-export function KeyProviderIcon({ size = 18 }: IconProps) {
+/**
+ * Fallback for providers without a bundled brand mark: a neutral monogram using
+ * the provider display name (e.g. "WeChat" -> W). To add an official mark, add
+ * an SVG component above and extend `providerIcon`.
+ */
+export function InitialProviderIcon({ label }: { label: string }) {
+    const initial = label.trim().slice(0, 1).toUpperCase() || "•";
+
     return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
-            <circle cx="8" cy="15" r="4" />
-            <path d="M11 12l9-9M17 6l3 3M14 9l2 2" />
-        </svg>
+        <span className="sz-provider-initial" aria-hidden="true">
+            {initial}
+        </span>
     );
 }
 
-export function providerIcon(alias: string | undefined, providerId: string | undefined): ReactNode {
+export function providerIcon(
+    alias: string | undefined,
+    providerId: string | undefined,
+    displayName?: string
+): ReactNode {
     const key = (alias ?? providerId ?? "").toLowerCase();
 
     if (key.includes("google")) {
@@ -79,5 +89,5 @@ export function providerIcon(alias: string | undefined, providerId: string | und
         return <AppleIcon />;
     }
 
-    return <KeyProviderIcon />;
+    return <InitialProviderIcon label={displayName ?? alias ?? providerId ?? "SeeZn ID"} />;
 }

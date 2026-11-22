@@ -38,7 +38,7 @@ export function SocialProviders(props: { providers: SocialProvider[]; copy: Auth
                         variant="outlined"
                         fullWidth
                         className="sz-social-button"
-                        startIcon={providerIcon(provider.alias, provider.providerId)}
+                        startIcon={providerIcon(provider.alias, provider.providerId, provider.displayName)}
                     >
                         {copy.continueWith(provider.displayName)}
                     </Button>

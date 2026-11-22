@@ -17,7 +17,7 @@ export function SeeZnTemplate(props: ComponentProps<typeof Template>) {
             infoNode={
                 <>
                     {props.infoNode}
-                    <AuthFooter />
+                    <AuthFooter locale={props.i18n?.currentLanguage?.languageTag} />
                 </>
             }
         />

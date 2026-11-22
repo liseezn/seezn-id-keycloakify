@@ -1,54 +1,11 @@
+@import "../../public-site/assets/tokens.css";
+
 /* ==========================================================================
    SeeZn ID authentication theme
    Loaded after Keycloakify's Keycloak default stylesheet (doUseDefaultCss).
    Custom pages use MUI components; the rules below brand the pages that fall
    back to Keycloakify DefaultPage (passkeys, IdP linking, terms, ...).
    ========================================================================== */
-
-:root {
-    color-scheme: light dark;
-    --sz-bg: #ffffff;
-    --sz-surface: #ffffff;
-    --sz-muted-bg: #f5f5f7;
-    --sz-text: #1d1d1f;
-    --sz-body: #333333;
-    --sz-muted: #86868b;
-    --sz-border: #d2d2d7;
-    --sz-accent: #0066cc;
-    --sz-accent-strong: #0055aa;
-    --sz-danger: #d70015;
-    --sz-danger-bg: #fdecec;
-    --sz-danger-border: #f3c1c1;
-    --sz-success-bg: #eaf6ee;
-    --sz-success-border: #b7dfc5;
-    --sz-warning-bg: #fff5e6;
-    --sz-warning-border: #f2d7a7;
-    --sz-radius: 10px;
-    --sz-radius-lg: 16px;
-    --sz-font: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
-        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --sz-bg: #000000;
-        --sz-surface: #111113;
-        --sz-muted-bg: #1c1c1e;
-        --sz-text: #f5f5f7;
-        --sz-body: #d1d1d6;
-        --sz-muted: #98989d;
-        --sz-border: #38383a;
-        --sz-accent: #2997ff;
-        --sz-accent-strong: #5ab0ff;
-        --sz-danger: #ff453a;
-        --sz-danger-bg: #2b1212;
-        --sz-danger-border: #5c2320;
-        --sz-success-bg: #10231a;
-        --sz-success-border: #1f4432;
-        --sz-warning-bg: #2a2010;
-        --sz-warning-border: #4d3a18;
-    }
-}
 
 /* ---------- page shell ---------- */
 
@@ -77,23 +34,32 @@ html.login-pf body.seezn-body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: clamp(28px, 7vh, 64px) 20px 40px !important;
+    padding: 0 0 40px !important;
     background: var(--sz-bg) !important;
 }
 
 #kc-header,
 .kc-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
     width: 100%;
-    margin: 0 0 26px;
-    padding: 0;
-    text-align: center;
+    margin: 0 0 8px;
+    padding: 14px max(24px, calc((100vw - 1200px) / 2 + 24px));
+    border-bottom: 1px solid var(--sz-border);
+    background: color-mix(in srgb, var(--sz-bg) 80%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    text-align: left;
     color: var(--sz-text) !important;
 }
 
 #kc-header-wrapper {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 9px;
     padding: 0 !important;
     color: var(--sz-text) !important;
@@ -123,8 +89,8 @@ html.login-pf body.seezn-body {
 }
 
 .card-pf {
-    width: min(100%, 400px);
-    margin: 0 auto !important;
+    width: min(100% - 40px, 400px);
+    margin: 32px auto 0 !important;
     padding: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -179,10 +145,10 @@ html.login-pf body.seezn-body {
 /* ---------- locale menu (language switch) ---------- */
 
 #kc-locale {
-    position: absolute;
-    top: 22px;
-    right: max(16px, calc(50% - 232px));
-    z-index: 20;
+    position: fixed;
+    top: 12px;
+    right: max(24px, calc((100vw - 1200px) / 2 + 24px));
+    z-index: 30;
     margin: 0 !important;
 }
 
@@ -458,18 +424,21 @@ html.login-pf body.seezn-body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     margin-top: 30px;
-    padding-top: 18px;
+    padding-top: 20px;
     border-top: 1px solid var(--sz-border);
     color: var(--sz-muted);
     font-size: 0.75rem;
     line-height: 1.5;
+    text-align: center;
 }
 
 .sz-footer nav {
     display: flex;
-    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 20px;
 }
 
 .sz-footer a {
@@ -843,33 +812,22 @@ input:focus-visible,
 }
 
 @media (max-width: 480px) {
-    .login-pf-page {
-        padding: 24px 16px 28px !important;
-    }
-
     #kc-header {
-        margin-bottom: 20px;
-    }
-
-    .login-pf-header .kcContentWrapperClass {
-    width: 100%;
-}
-
-.login-pf-header .col-md-10 {
-    width: 100%;
-}
-
-.login-pf-header .subtitle {
-    display: none;
-}
-
-#kc-page-title {
-        font-size: 1.5rem !important;
+        padding: 12px 16px;
     }
 
     #kc-locale {
-        top: 12px;
-        right: 12px;
+        top: 10px;
+        right: 16px;
+    }
+
+    .card-pf {
+        width: min(100% - 32px, 400px);
+        margin-top: 24px !important;
+    }
+
+    #kc-page-title {
+        font-size: 1.5rem !important;
     }
 
     .sz-totp-qr {
@@ -887,4 +845,18 @@ input:focus-visible,
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* Fallback monogram for identity providers without a bundled brand mark. */
+.sz-provider-initial {
+    display: inline-grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--sz-muted-bg);
+    color: var(--sz-text);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
 }

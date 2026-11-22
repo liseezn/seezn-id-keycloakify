@@ -75,8 +75,9 @@ artifacts/                 # 验收截图与报告（构建产物，git 忽略�
 - **表单提交**：一律使用 Keycloak 生成的 `url.*Action` 与字段名，不新增自定义请求，
   不改认证流程；隐藏字段（`credentialId` 等）必须保留。
 - **错误信息**：使用 `messagesPerField` / `message` 原样渲染（`kcSanitize`），不得改写语义。
+- **社交图标**：`ProviderIcons.tsx` 内置 Google/GitHub/Microsoft/Apple；其余 IdP 自动回退为显示名首字母徽标（`.sz-provider-initial`）。新增平台时补一个 SVG 并在 `providerIcon()` 匹配 alias 即可。
 - **社交登录**：只渲染 `kcContext.social.providers`（Realm 实际启用的 IdP），href 指向
-  `provider.loginUrl`；图标按 alias 映射，未知 alias 用通用图标。
+  `provider.loginUrl`；图标按 alias 映射，已知平台用品牌图标，未知 alias 用显示名首字母徽标。
 - **语言**：Keycloakify `Template` 的 locale 菜单，href 由 Keycloak 生成，保留认证参数；
   自定义文案通过 `i18n.ts` 的 custom translations 与 `useSeeZnStrings(locale)` 提供。
 - **深浅色**：CSS `prefers-color-scheme` + `useColorMode()`，不提供页内手动开关（与设计稿一致）。
@@ -87,18 +88,20 @@ artifacts/                 # 验收截图与报告（构建产物，git 忽略�
 - 保留批准原稿的静态 HTML（`public-site/`），不引入第二个 React 应用、不做前端构建。
 - 路由即文件：`/`、`/terms.html`、`/privacy.html`；链接使用绝对路径（与 nginx 部署一致）。
 - 内容：条款 16 章、隐私政策 16 章与表格原样保留；页面自带中英切换与系统深浅色。
+- 统一外观：三页共用 `public-site/assets/seezn.css` / `seezn.js`，与认证主题共用 `public-site/assets/tokens.css`（主题 `@import` 同一文件）；头部品牌/语言与认证页一致，页脚均为“版权 + 首页/条款/隐私/邮箱”。
 - 资源：字体/图标沿用原稿的 Google Fonts 与 lucide CDN；nginx CSP 相应放行，
   后续可自托管资源并收紧 CSP（见 `docker/nginx.conf` 注释）。
 - 登录按钮：原稿指向 `/realms/seezn/account/`；接入应用应使用 OIDC 授权 URL（见技术文档 §4）。
 - 文档说明：公共页与 Keycloak 认证主题独立部署在同一域名下。
 
-## 5. 设计令牌（认证主题）
+## 5. 设计令牌（主题与站点共用）
 
 浅色：bg `#ffffff`，surface `#ffffff`，muted `#f5f5f7`，text `#1d1d1f`，
 secondary `#86868b`，border `#d2d2d7`，accent `#0066cc`，body `#333333`。
 深色：bg `#000000`，surface `#111113`，muted `#1c1c1e`，text `#f5f5f7`，
 secondary `#98989d`，border `#38383a`，accent `#2997ff`，body `#d1d1d6`。
 圆角：控件 10px，卡片 16px，胶囊 980px。字体：Inter + CJK 系统回退。
+令牌单一来源：`public-site/assets/tokens.css`；认证主题 `src/login/seezn.css` 与公共站 `public-site/assets/seezn.css` 均 `@import` 该文件。主题另用 `src/shared/theme.ts` 把同一组数值映射为 MUI 主题。
 
 ## 6. 命令
 

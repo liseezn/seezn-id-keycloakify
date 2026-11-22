@@ -1,0 +1,50 @@
+/* ==========================================================================
+   SeeZn ID — shared design tokens
+   Single source for the Keycloak theme and the static public pages.
+   Colours, radii and typography stay identical on every surface.
+   ========================================================================== */
+
+:root {
+    color-scheme: light dark;
+    --sz-bg: #ffffff;
+    --sz-surface: #ffffff;
+    --sz-muted-bg: #f5f5f7;
+    --sz-text: #1d1d1f;
+    --sz-body: #333333;
+    --sz-muted: #86868b;
+    --sz-border: #d2d2d7;
+    --sz-accent: #0066cc;
+    --sz-accent-strong: #0055aa;
+    --sz-danger: #d70015;
+    --sz-danger-bg: #fdecec;
+    --sz-danger-border: #f3c1c1;
+    --sz-success-bg: #eaf6ee;
+    --sz-success-border: #b7dfc5;
+    --sz-warning-bg: #fff5e6;
+    --sz-warning-border: #f2d7a7;
+    --sz-radius: 10px;
+    --sz-radius-lg: 16px;
+    --sz-font: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --sz-bg: #000000;
+        --sz-surface: #111113;
+        --sz-muted-bg: #1c1c1e;
+        --sz-text: #f5f5f7;
+        --sz-body: #d1d1d6;
+        --sz-muted: #98989d;
+        --sz-border: #38383a;
+        --sz-accent: #2997ff;
+        --sz-accent-strong: #5ab0ff;
+        --sz-danger: #ff453a;
+        --sz-danger-bg: #2b1212;
+        --sz-danger-border: #5c2320;
+        --sz-success-bg: #10231a;
+        --sz-success-border: #1f4432;
+        --sz-warning-bg: #2a2010;
+        --sz-warning-border: #4d3a18;
+    }
+}

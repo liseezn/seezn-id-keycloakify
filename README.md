@@ -31,12 +31,14 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
   信息页、错误页、会话过期页；其余流程回退 Keycloakify `DefaultPage`，统一由 `seezn.css` 品牌化。
 - Google 等第三方登录按钮只渲染 Realm 实际启用的 IdP，链接由 Keycloak 生成（不接触 Client Secret）。
 - 中英文切换走 Keycloak `kc_locale` 机制，保留当前认证请求参数。
-- 跟随系统深浅色；移动端优先；统一品牌字标与页脚（服务条款 / 隐私政策）。
+- 统一头部/语言/页脚：与公共站点共用 `public-site/assets/tokens.css` 设计令牌，顶栏品牌居左、语言居右，页脚统一为版权 + 首页/条款/隐私/邮箱。
+- 跟随系统深浅色；移动端优先；认证页与公共页使用同一套字体、颜色、圆角与间距。
 
 **公共站点**（`public-site/**`）
 
 - `/`、`/terms.html`、`/privacy.html` 三个静态页面，中英双语、深浅色、响应式，内容与批准的原稿一致
   （条款 16 章、隐私政策 16 章与 4 张表格）。
+- 三页共用 `public-site/assets/seezn.css`、`seezn.js` 与 `tokens.css`，头部/页脚与认证主题视觉统一。
 - 首页只有点击按钮才进入认证流程；nginx 直接托管，无需前端构建。
 
 **部署与验收**
@@ -46,6 +48,16 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 - `tests/e2e/`：精简 Playwright 验收套件（认证流程 + 移动端/暗色），在手动触发的 CI 中连接一次性 Keycloak 执行。
 - `.github/workflows/ci.yaml`：Lint、类型检查、主题 JAR 构建、GitHub Release（默认流水线不含验收与站点构建，避免消耗 Actions 额度）。
 - `.github/workflows/acceptance.yml`：`workflow_dispatch` 手动验收（一次性 Keycloak + Mock SMTP + Playwright），按需运行。
+
+## 第三方 SSO 接入与图标
+
+在 Keycloak Realm → Identity Providers 添加提供商（Alias 如 `github`、`wechat`），主题会自动按
+`social.providers` 渲染按钮，未启用的提供商不会显示。图标规则：
+
+- 内置品牌图标：Google、GitHub、Microsoft、Apple（`src/login/components/ProviderIcons.tsx`）。
+- 其他提供商自动使用**显示名首字母徽标**（如 `WeChat` → `W`），无需先准备素材。
+- 要换官方图标：在 `ProviderIcons.tsx` 增加 SVG 组件，并在 `providerIcon()` 中按 alias/providerId 匹配即可。
+- 本主题不使用 Keycloak IdP 的 `iconClasses`（Font Awesome），图标完全由主题控制。
 
 ## 快速开始（只构建，不启动服务）
 

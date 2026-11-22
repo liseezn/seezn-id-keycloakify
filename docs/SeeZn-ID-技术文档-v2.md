@@ -177,6 +177,9 @@ src/
     useColorMode.ts        # 跟随系统深浅色
 public-site/               # 公共三页（静态 HTML，原批准设计稿）
   index.html terms.html privacy.html favicon-32x32.png
+  assets/tokens.css        # 共享设计令牌（主题与站点共同 @import）
+  assets/seezn.css         # 站点布局、统一头部/页脚、语言切换
+  assets/seezn.js          # 语言切换与 lucide 初始化
 keycloak/
   realm-seezn.json         # Realm 导入（主题、IdP、SMTP、客户端）
 scripts/                   # 部署与自检脚本
@@ -195,9 +198,11 @@ dist/ dist_keycloak/       # 主题构建产物（git 忽略）；public-site �
 ### 5.1 组件与字体
 
 - **MUI v6 + Emotion**：认证主题使用 `createSeeZnTheme(mode)` 与 `ThemeProvider`；公共三页是独立静态 HTML，不加载 MUI。
-- **lucide-react**：品牌指纹、密码显隐等；社交图标在 `ProviderIcons.tsx` 内以 SVG 实现，未知 IdP 用通用钥匙图标。
+- **lucide-react**：品牌指纹、密码显隐等；社交图标在 `ProviderIcons.tsx` 内以 SVG 实现，已知 IdP 用品牌图标，未知 IdP 用显示名首字母徽标（便于新增平台）。
 - **Inter 自托管（认证主题）**：`src/main.tsx` 引入 `@fontsource/inter` 400/500/600/700，随主题打包，不依赖 Google Fonts；CJK 用系统字体回退。公共三页沿用原稿的 Google Fonts 与 lucide CDN（nginx CSP 已放行），后续可自托管并收紧。
-- **CSS 变量**：`seezn.css` 以 `--sz-*` 承载令牌，供 `DefaultPage` 使用；自定义页面用 MUI 主题，两套数值一致。
+- **统一设计令牌**：`public-site/assets/tokens.css` 是唯一来源，认证主题 `src/login/seezn.css` 与公共站 `public-site/assets/seezn.css` 都 `@import` 它；两侧共享 `--sz-*` 命名与深浅色取值。
+- **统一头部/语言/页脚**：公共站使用 `.sz-header` / `.sz-brand` / `.sz-lang` / `.sz-footer`；认证主题用 CSS 将 Keycloakify 的 `#kc-header`、`#kc-locale`、`.sz-footer` 对齐为相同的顶栏（品牌居左、语言居右、底部细线）和相同页脚（版权 + 首页/条款/隐私/邮箱），品牌字号、间距与颜色一致。
+- **CSS 分层**：认证页另有 MUI 主题（`src/shared/theme.ts`）承载控件样式，令牌数值与 `tokens.css` 对齐；公共站不加载 MUI。
 
 ### 5.2 设计令牌
 
@@ -214,7 +219,7 @@ dist/ dist_keycloak/       # 主题构建产物（git 忽略）；public-site �
 
 ### 5.3 响应式、暗色与无障碍
 
-- 表单容器 `width: min(100%, 400px)`，页面内边距 20px（≤480px 为 16px），移动端无横向滚动。
+- 顶栏为全宽 sticky 毛玻璃栏，品牌居左、语言居右；认证表单容器 `width: min(100% - 40px, 400px)`，移动端 16px 边距，无横向滚动。
 - 认证页：MUI 断点 `xs 0 / sm 600 / md 900 / lg 1200 / xl 1536`，登录表单在 480px 收紧；公共三页沿用原稿 600px 媒体查询。
 - 暗色只跟随系统（`prefers-color-scheme` + `useColorMode()`），无页内开关；同步 `color-scheme`。站点只切换语言，不切换主题。
 - 无障碍：显式 label、`aria-invalid`/`aria-describedby`、错误 `role="alert"`；按钮最小 44px；`focus-visible` 2px 轮廓；语言按钮 `aria-pressed`；`html lang` 同步；支持 `prefers-reduced-motion`。对比度用工具复核（待验证）。
@@ -247,7 +252,7 @@ dist/ dist_keycloak/       # 主题构建产物（git 忽略）；public-site �
 - 不用 `fetch`/XHR 自行提交认证表单，不自行拼接登录 URL，不绕过认证会话；提交按钮的 `name`/`value` 保留。
 - `kcContext.message` 为页面级消息，由 Template 的 `displayMessage` 渲染；`messagesPerField` 为字段级错误，可用 `existsError`/`get`/`getFirstError`/`printIfExists`。按字段原样渲染，不改语义；存在字段错误时关闭全局消息避免重复。
 - 消息按 `kcSanitize` 语义处理；React 默认转义，禁止 `dangerouslySetInnerHTML`。登录失败、找回密码提示不得引入账号枚举。
-- 只渲染 `kcContext.social.providers`（Realm 实际启用的 IdP），`href` 用 `provider.loginUrl`；未知 alias 用通用图标。Realm 不允许密码登录时不显示密码表单与注册入口。
+- 只渲染 `kcContext.social.providers`（Realm 实际启用的 IdP），`href` 用 `provider.loginUrl`；已知平台用品牌图标，未知 alias 用显示名首字母徽标。Realm 不允许密码登录时不显示密码表单与注册入口。
 
 ## 7. 国际化
 
@@ -299,9 +304,27 @@ https://auth.liseezn.top/realms/seezn/broker/google/endpoint
 - 按钮仅在 Realm 启用 Google 且 `social.providers` 含该 provider 时显示，链接由 Keycloak 生成。配置不完整时按钮可能显示但登录失败；未完成凭据与真实回调验证前不得宣称“Google 登录已开通”。
 - 生产必须人工验证新用户创建、已有用户关联、取消授权；本地只验证跳转参数与回调地址。
 
-### 8.3 扩展其他 IdP
+### 8.3 扩展其他 IdP 与图标
 
-在 Realm 添加 IdP（GitHub/Microsoft/Apple/通用 OIDC），回调为 `https://auth.liseezn.top/realms/seezn/broker/<alias>/endpoint`，配置 scopes 与 Trust Email；`ProviderIcons.tsx` 可加图标映射，未映射用通用图标；同步更新隐私政策中的第三方提供商范围并重新验收。
+**接入步骤**
+
+1. Realm → Identity Providers → 选择提供商（GitHub、Microsoft、Apple、微信、通用 OIDC 等），创建实例。
+2. 设置 **Alias**（如 `github`、`wechat`）；该值决定回调 `https://auth.liseezn.top/realms/seezn/broker/<alias>/endpoint` 与主题按钮的 `provider.loginUrl`。
+3. 填 Client ID/Secret、scopes 与 Trust Email 等；Secret 只保存在 Keycloak 服务端。
+4. 无需改主题即可出现按钮：`social.providers` 由 Keycloak 按 Realm 实际启用项下发，主题遍历渲染，未启用的提供商不会出现。
+
+**图标的两种方式**
+
+- 内置品牌图标：在 `src/login/components/ProviderIcons.tsx` 增加一个 SVG 组件，并在 `providerIcon()` 里按 `alias`/`providerId` 匹配（现有 Google、GitHub、Microsoft、Apple）。例：
+  ```tsx
+  export function WeChatIcon({ size = 18 }: IconProps) {
+      return <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">{/* path */}</svg>;
+  }
+  // providerIcon() 内：if (key.includes("wechat")) return <WeChatIcon />;
+  ```
+- 未匹配的提供商自动回退为**显示名首字母徽标**（如 `WeChat` → `W`，样式 `.sz-provider-initial`），不需要为每个平台立即准备素材；后续补 SVG 即可升级。
+
+注意：本主题不依赖 Keycloak IdP 的 `iconClasses`（Font Awesome），图标完全由主题控制；新增提供商后需同步更新隐私政策中的第三方范围，并重新验收 OAuth 回调。
 
 ## 9. 构建与发布
 
