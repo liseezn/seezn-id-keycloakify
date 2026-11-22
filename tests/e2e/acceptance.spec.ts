@@ -213,17 +213,17 @@ test.describe("public pages", () => {
     const SITE = "http://127.0.0.1:5174";
 
     test("home, terms and privacy stay intact", async ({ page }) => {
-        await page.goto(`${SITE}/`);
+        await page.goto(`${SITE}/`, { waitUntil: "domcontentloaded" });
         await expect(page).toHaveTitle(/SeeZn ID/);
         await expect(page.locator(".sz-header")).toBeVisible();
 
-        await page.goto(`${SITE}/terms.html`);
+        await page.goto(`${SITE}/terms.html`, { waitUntil: "domcontentloaded" });
         await expect(page.locator('main div[lang="en"] h2')).toHaveCount(16);
         await expect(page.locator('main div[lang="zh"] h2')).toHaveCount(16);
         await page.locator('[data-lang="zh"]').click();
         await expect(page.locator("main h1").first()).toHaveText("服务条款");
 
-        await page.goto(`${SITE}/privacy.html`);
+        await page.goto(`${SITE}/privacy.html`, { waitUntil: "domcontentloaded" });
         await expect(page.locator('main div[lang="en"] h2')).toHaveCount(16);
         await expect(page.locator('main div[lang="zh"] h2')).toHaveCount(16);
         expect(await page.locator("main table").count()).toBeGreaterThanOrEqual(4);
