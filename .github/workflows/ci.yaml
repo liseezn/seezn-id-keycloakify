@@ -46,6 +46,16 @@ jobs:
       - name: Build Keycloak theme JAR
         run: npm run build-keycloak-theme
 
+      - name: Verify theme types
+        run: |
+          JAR="dist_keycloak/keycloak-theme-for-kc-all-other-versions.jar"
+          unzip -p "$JAR" META-INF/keycloak-themes.json
+          unzip -p "$JAR" META-INF/keycloak-themes.json | grep -q '"login"'
+          unzip -p "$JAR" META-INF/keycloak-themes.json | grep -q '"account"'
+          unzip -l "$JAR" | grep -q 'theme/seezn-id/account/'
+          unzip -l "$JAR" | grep -q 'theme/seezn-id/login/'
+          echo "theme types OK: login + account"
+
       - name: Upload theme JAR
         uses: actions/upload-artifact@v4
         with:
