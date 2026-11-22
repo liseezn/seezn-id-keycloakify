@@ -103,7 +103,7 @@ npm run dev        # Keycloak 主题前端（需 mock kcContext 或 Keycloakify 
   Keycloak 26.8.2 + Mock SMTP，执行 `npm run test:e2e`；或
 - 在 staging / 生产宿主机按 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md) 用 Docker 执行同一套测试。
 
-测试矩阵、通过标准与已知限制见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
+2026-11-22 的 CI 验收已通过（run 13，commit `5694595`）：账号中心 SeeZn 外壳、公共三页、登录/注册/重置/TOTP/Google/双语/移动端/暗色。记录见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
 
 ## 文档
 

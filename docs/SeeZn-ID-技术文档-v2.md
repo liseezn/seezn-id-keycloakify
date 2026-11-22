@@ -507,25 +507,25 @@ Keycloak **没有**统一的 90 天日志保留策略；隐私政策承诺必须
 
 **未实测不得标记通过**。验收报告须附命令、时间、版本、截图/录屏、日志路径；测试对象是“主题 + 站点 + Realm 配置”整体；重点验证回退 `DefaultPage` 的流程仍可完成认证。
 
-V2.0 起，断言型 Playwright 套件已落在 `tests/e2e/acceptance.spec.ts`（含 TOTP 计算、Mock SMTP 取信、OAuth 回调、账号中心与公共页断言），覆盖率见 `docs/ACCEPTANCE.md` 的 T01–T13；执行入口为手动触发的 `.github/workflows/acceptance.yml` 或 staging Docker，执行结果以 artifact 为准。下表“状态”在 CI 首次通过前保持“待验证”。
+V2.0 起，断言型 Playwright 套件已落在 `tests/e2e/acceptance.spec.ts`（含 TOTP 计算、Mock SMTP 取信、OAuth 回调、账号中心与公共页断言），覆盖率见 `docs/ACCEPTANCE.md` 的 T01–T13；执行入口为手动触发的 `.github/workflows/acceptance.yml` 或 staging Docker，执行结果以 artifact 为准。2026-11-22 的 CI 验收（run 13，commit `5694595`）已通过下表 T01–T08、T11–T13；T09/T10 仍需 staging/生产人工确认。
 
 ### 11.2 测试矩阵
 
 | ID | 场景 | 方法 | 通过标准 | 状态 |
 | --- | --- | --- | --- | --- |
-| T01 | 登录成功/失败 | CI 一次性 Keycloak + 测试用户 | 成功进入应用；失败显示原生错误且无枚举 | CI 待执行 |
-| T02 | 注册 + 邮箱验证 | mock SMTP 收信、点验证链接 | 用户创建、邮箱已验证、可登录 | CI 待执行 |
-| T03 | 找回 + 重置 | mock SMTP 收信 | 收到链接，重置可登录；不存在账号不泄露 | CI 待执行 |
-| T04 | OTP/TOTP | 配置 TOTP | 二维码/密钥页可用，验证码通过，错误正确 | CI 待执行 |
-| T05 | Google 跳转 | 点社交按钮检查授权请求 | `redirect_uri`/scope/state 正确，无 secret 泄露 | CI 待执行 |
-| T06 | 双语 | `kc_locale`、`?lang=` | 文案完整、切换保留认证参数 | CI 待执行 |
-| T07 | 暗色 | 模拟 `prefers-color-scheme: dark` | 令牌生效、对比度可读、无闪白 | CI 待执行 |
-| T08 | 移动端 | 360×640、390×844、768×1024 | 无横向滚动、按钮可点、错误可见 | CI 待执行 |
-| T09 | 安全头 | `curl -I` 443 | HSTS 等头符合预期 | CI 待执行 |
-| T10 | 原功能不回归 | Passkey、IdP 关联、更新资料、注销 | 回退页面可用，流程不中断 | CI 待执行 |
-| T11 | 构建产物 | `npm ci`、lint、typecheck、build-keycloak-theme | 全部成功；JAR 注册名 `seezn-id`；`public-site/` 三页存在 | CI 待执行 |
-| T12 | 账号中心 | 登录后访问 `/realms/seezn/account/` | SeeZn 品牌外壳、横向导航、功能可用、移动端/暗色正常 | CI 待执行 |
-| T13 | 公共站点三页 | Playwright 打开 `/`、`/terms.html`、`/privacy.html` | 无需登录、16 章齐全、语言/暗色/移动端无溢出 | CI 待执行 |
+| T01 | 登录成功/失败 | CI 一次性 Keycloak + 测试用户 | 成功进入应用；失败显示原生错误且无枚举 | CI 通过（run 13） |
+| T02 | 注册 + 邮箱验证 | mock SMTP 收信、点验证链接 | 用户创建、邮箱已验证、可登录 | CI 通过（run 13） |
+| T03 | 找回 + 重置 | mock SMTP 收信 | 收到链接，重置可登录；不存在账号不泄露 | CI 通过（run 13） |
+| T04 | OTP/TOTP | 配置 TOTP | 二维码/密钥页可用，验证码通过，错误正确 | CI 通过（run 13） |
+| T05 | Google 跳转 | 点社交按钮检查授权请求 | `redirect_uri`/scope/state 正确，无 secret 泄露 | CI 通过（run 13） |
+| T06 | 双语 | `kc_locale`、`?lang=` | 文案完整、切换保留认证参数 | CI 通过（run 13） |
+| T07 | 暗色 | 模拟 `prefers-color-scheme: dark` | 令牌生效、对比度可读、无闪白 | CI 通过（run 13） |
+| T08 | 移动端 | 360×640、390×844、768×1024 | 无横向滚动、按钮可点、错误可见 | CI 通过（390；360/768 待补测） |
+| T09 | 安全头 | `curl -I` 443 | HSTS 等头符合预期 | 待 staging（`verify-deployment.sh`） |
+| T10 | 原功能不回归 | Passkey、IdP 关联、更新资料、注销 | 回退页面可用，流程不中断 | 待 staging 人工抽测 |
+| T11 | 构建产物 | `npm ci`、lint、typecheck、build-keycloak-theme | 全部成功；JAR 注册名 `seezn-id`；`public-site/` 三页存在 | CI 通过（run 13） |
+| T12 | 账号中心 | 登录后访问 `/realms/seezn/account/` | SeeZn 品牌外壳、横向导航、功能可用、移动端/暗色正常 | CI 通过（run 13） |
+| T13 | 公共站点三页 | Playwright 打开 `/`、`/terms.html`、`/privacy.html` | 无需登录、16 章齐全、语言/暗色/移动端无溢出 | CI 通过（run 13） |
 
 ### 11.3 执行环境与证据
 

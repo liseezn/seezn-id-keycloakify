@@ -90,7 +90,18 @@ CI 每次运行上传：
 
 验收记录应包含：commit/tag、工作流链接、JAR 版本与 SHA256、测试报告链接、上线变更单。
 
-## 4. 未覆盖/需人工确认
+## 4. 最近一次 CI 验收记录
+
+| 项 | 值 |
+| --- | --- |
+| 时间 | 2026-11-22 22:55–22:58 UTC（2026-11-23 06:55–06:58 Asia/Shanghai） |
+| 工作流 | `.github/workflows/acceptance.yml`（run 13） |
+| Commit | `56945952e4ecb6fe945b94e97ab5f97cc2ff38c5` |
+| 结果 | **成功**（账号中心、公共三页、登录/注册/重置/TOTP/Google/双语/移动端/暗色全部断言通过） |
+| 链接 | https://github.com/liseezn/seezn-id-keycloakify/actions/runs/45080428918 |
+| 产物 | 构建出的 `keycloak-theme-for-kc-all-other-versions.jar` + Playwright JSON 报告 artifact `acceptance-report` |
+
+## 5. 未覆盖/需人工确认
 
 | 项 | 原因 | 确认方式 |
 | --- | --- | --- |
@@ -101,8 +112,8 @@ CI 每次运行上传：
 | 多浏览器矩阵 | CI 只跑 Chromium | Firefox/Safari/Edge 手工抽测（见技术文档 §12.3） |
 | WebAuthn / Passkeys、IdP 绑定等低频流程 | 未在 Realm 启用 | 启用后人工回归，DefaultPage 回退已保留功能 |
 
-## 5. 判定
+## 6. 判定
 
-- T01–T13 全部通过，且补充检查零 error，方可判定"界面与流程验收通过"。
+- T01–T13 全部通过，且补充检查零 error，方可判定"界面与流程验收通过"；T14 需部署后由 `scripts/verify-deployment.sh` 确认。
 - 涉及生产凭据、邮件、TLS、保留策略的条目未确认前，不得标记"生产就绪"。
 - 任何跳过（skip）必须在报告中写明原因与补测计划。
