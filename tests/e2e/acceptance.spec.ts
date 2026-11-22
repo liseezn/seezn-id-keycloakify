@@ -178,6 +178,9 @@ test.describe("authentication", () => {
     });
 
     test("TOTP enrollment and second-factor login", async ({ page, browser }) => {
+        // Enrollment consumes the current 30s TOTP window, so the second login
+        // needs to wait for a fresh window to avoid Keycloak's replay protection.
+        test.setTimeout(150_000);
         console.log("TOTP: start login");
         await page.goto(authUrl());
         await page.fill("#username", "mfa");
@@ -207,6 +210,9 @@ test.describe("authentication", () => {
         await submitLogin(fresh, "mfa");
         await expect.poll(() => pageId(fresh), { timeout: 30_000 }).toBe("login-otp.ftl");
         console.log("TOTP: otp page");
+        const waitMs = 30_000 - (Date.now() % 30_000) + 1_500;
+        console.log("TOTP: waiting for next window", waitMs);
+        await fresh.waitForTimeout(waitMs);
         await fresh.fill("#otp", totp(secret));
         await fresh.click("[data-testid=otp-submit]");
         await expect.poll(() => pageId(fresh), { timeout: 30_000 }).not.toBe("login-otp.ftl");
