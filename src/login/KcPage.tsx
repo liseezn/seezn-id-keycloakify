@@ -16,6 +16,7 @@ function SeeZnTemplate(props: ComponentProps<typeof Template>) {
     return (
         <Template
             {...props}
+            displayInfo={true}
             infoNode={
                 <>
                     {props.infoNode}
