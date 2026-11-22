@@ -25,15 +25,29 @@ function authUrl() {
 const pageId = (page: Page) =>
     page.evaluate(() => (window as Window & { kcContext?: { pageId?: string } }).kcContext?.pageId);
 
-async function startLogin(page: Page, username: string, password = PASSWORD) {
-    const callback = page.waitForRequest(request => request.url().includes("/callback?"), {
-        timeout: 30_000
-    });
+async function submitLogin(page: Page, username: string, password = PASSWORD) {
     await page.goto(authUrl());
     await page.fill("#username", username);
     await page.fill("#password", password);
     await page.click("[data-testid=login-submit]");
+}
+
+async function startLogin(page: Page, username: string, password = PASSWORD) {
+    const callback = page.waitForRequest(request => request.url().includes("/callback?"), {
+        timeout: 30_000
+    });
+    await submitLogin(page, username, password);
     return callback;
+}
+
+async function stubCallback(page: Page) {
+    await page.context().route("http://localhost:3000/**", route =>
+        route.fulfill({
+            status: 200,
+            contentType: "text/html",
+            body: "<!doctype html><title>callback</title>ok"
+        })
+    );
 }
 
 test.describe("authentication", () => {
@@ -55,7 +69,7 @@ test.describe("authentication", () => {
     });
 
     test("invalid credentials keep Keycloak error semantics", async ({ page }) => {
-        await startLogin(page, "alice", "wrong-password");
+        await submitLogin(page, "alice", "wrong-password");
         const error = page
             .locator("#username-error, #password-error, [class*='alert-']")
             .first();
@@ -71,7 +85,9 @@ test.describe("authentication", () => {
     });
 
     test("account center uses the SeeZn shell", async ({ page }) => {
+        await stubCallback(page);
         await startLogin(page, "alice");
+        await page.waitForTimeout(800);
         await page.goto(`${KC}/realms/seezn/account/`);
         await expect(page).toHaveTitle(/SeeZn ID/);
         await expect(page.locator(".pf-v5-c-masthead")).toBeVisible();
@@ -179,7 +195,7 @@ test.describe("authentication", () => {
         await expect.poll(() => pageId(page), { timeout: 30_000 }).not.toBe("login-config-totp.ftl");
 
         const fresh = await browser.newPage();
-        await startLogin(fresh, "mfa");
+        await submitLogin(fresh, "mfa");
         await expect.poll(() => pageId(fresh), { timeout: 30_000 }).toBe("login-otp.ftl");
         await fresh.fill("#otp", totp(secret));
         await fresh.click("[data-testid=otp-submit]");
@@ -202,12 +218,14 @@ test.describe("public pages", () => {
         await expect(page.locator(".sz-header")).toBeVisible();
 
         await page.goto(`${SITE}/terms.html`);
-        await expect(page.locator("main h2")).toHaveCount(16);
+        await expect(page.locator('main div[lang="en"] h2')).toHaveCount(16);
+        await expect(page.locator('main div[lang="zh"] h2')).toHaveCount(16);
         await page.locator('[data-lang="zh"]').click();
-        await expect(page.locator("main h1")).toHaveText("服务条款");
+        await expect(page.locator("main h1").first()).toHaveText("服务条款");
 
         await page.goto(`${SITE}/privacy.html`);
-        await expect(page.locator("main h2")).toHaveCount(16);
+        await expect(page.locator('main div[lang="en"] h2')).toHaveCount(16);
+        await expect(page.locator('main div[lang="zh"] h2')).toHaveCount(16);
         expect(await page.locator("main table").count()).toBeGreaterThanOrEqual(4);
 
         await page.setViewportSize({ width: 390, height: 844 });
