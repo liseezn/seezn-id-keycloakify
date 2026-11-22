@@ -178,25 +178,34 @@ test.describe("authentication", () => {
     });
 
     test("TOTP enrollment and second-factor login", async ({ page, browser }) => {
+        console.log("TOTP: start login");
         await page.goto(authUrl());
         await page.fill("#username", "mfa");
         await page.fill("#password", PASSWORD);
         await page.click("[data-testid=login-submit]");
+        console.log("TOTP: submitted password, waiting config page");
         await expect.poll(() => pageId(page), { timeout: 30_000 }).toBe("login-config-totp.ftl");
+        console.log("TOTP: config page", page.url());
 
         if (await page.locator("#mode-manual").count()) {
+            console.log("TOTP: switching to manual mode");
             await page.locator("#mode-manual").click();
             await page.waitForSelector("#kc-totp-secret-key");
         }
         const secret = (await page.locator("#kc-totp-secret-key").innerText()).trim();
+        console.log("TOTP: secret length", secret.length);
         await page.fill("#totp", totp(secret));
         await page.fill("#userLabel", "E2E device");
+        console.log("TOTP: submitting enrollment");
         await page.click("#saveTOTPBtn");
         await expect.poll(() => pageId(page), { timeout: 30_000 }).not.toBe("login-config-totp.ftl");
+        console.log("TOTP: enrollment done", page.url());
 
         const fresh = await browser.newPage();
+        console.log("TOTP: second login");
         await submitLogin(fresh, "mfa");
         await expect.poll(() => pageId(fresh), { timeout: 30_000 }).toBe("login-otp.ftl");
+        console.log("TOTP: otp page");
         await fresh.fill("#otp", totp(secret));
         await fresh.click("[data-testid=otp-submit]");
         await expect.poll(() => pageId(fresh), { timeout: 30_000 }).not.toBe("login-otp.ftl");

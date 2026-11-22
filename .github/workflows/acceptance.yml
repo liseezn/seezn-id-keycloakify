@@ -70,10 +70,11 @@ jobs:
 
       - name: Run acceptance suite
         run: |
+          set -o pipefail
           if [ -n "${{ inputs.grep }}" ]; then
-            npm run test:e2e -- --grep "${{ inputs.grep }}"
+            npm run test:e2e -- --grep "${{ inputs.grep }}" 2>&1 | tee /tmp/e2e.log
           else
-            npm run test:e2e
+            npm run test:e2e 2>&1 | tee /tmp/e2e.log
           fi
 
       - name: Summarize Playwright failures
@@ -111,6 +112,10 @@ jobs:
           } else {
             console.log(lines.join("\n"));
           }
+          try {
+            const tail = fs.readFileSync("/tmp/e2e.log", "utf8").split(/\r?\n/).slice(-60).join(" | ");
+            console.log(`::error title=E2E_LOG_TAIL::${tail.slice(-6000)}`);
+          } catch {}
           NODE
 
       - name: Upload report
