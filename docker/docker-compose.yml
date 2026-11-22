@@ -1,0 +1,121 @@
+# SeeZn ID production-ish deployment for one host.
+#
+#   cp docker/.env.example docker/.env   # then edit secrets
+#   npm run build-keycloak-theme         # creates dist_keycloak/*.jar
+#   docker compose -f docker/docker-compose.yml up -d --build
+#
+# The public entry point is this compose file's `site` service, published on
+# 127.0.0.1:8080 by default. TLS (80/443) is terminated by a host-level reverse
+# proxy in front of it; see docker/nginx.conf and docs/DEPLOYMENT.md.
+name: seezn-id
+
+services:
+    postgres:
+        image: postgres:16
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB:-keycloak}
+            POSTGRES_USER: ${POSTGRES_USER:-keycloak}
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?copy docker/.env.example to docker/.env and set POSTGRES_PASSWORD}"
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        healthcheck:
+            # Double $$ escapes Compose interpolation: the shell inside the
+            # container expands POSTGRES_USER/POSTGRES_DB at runtime.
+            test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+        logging:
+            driver: json-file
+            options:
+                max-size: "20m"
+                max-file: "10"
+
+    keycloak:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.keycloak
+            args:
+                KEYCLOAK_IMAGE: quay.io/keycloak/keycloak:26.8.2
+                THEME_JAR: ${THEME_JAR:-dist_keycloak/keycloak-theme-for-kc-all-other-versions.jar}
+        image: seezn-id/keycloak:26.8.2
+        restart: unless-stopped
+        environment:
+            # Keycloak 26: kc.db is a build-time option. The image is built with
+            # postgres, so this value must not change without rebuilding.
+            KC_DB: postgres
+            KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-keycloak}
+            KC_DB_USERNAME: ${POSTGRES_USER:-keycloak}
+            KC_DB_PASSWORD: "${POSTGRES_PASSWORD:?copy docker/.env.example to docker/.env and set POSTGRES_PASSWORD}"
+            # Public origin. Keycloak must emit https://auth.liseezn.top URLs
+            # even though nginx talks plain HTTP to it.
+            KC_HOSTNAME: ${KC_HOSTNAME:-https://auth.liseezn.top}
+            KC_PROXY_HEADERS: xforwarded
+            KC_HTTP_ENABLED: "true"
+            KC_HEALTH_ENABLED: "true"
+            # Applied only when the master realm is first initialised. Keep the
+            # values in docker/.env out of version control.
+            KC_BOOTSTRAP_ADMIN_USERNAME: "${KC_BOOTSTRAP_ADMIN_USERNAME:?set KC_BOOTSTRAP_ADMIN_USERNAME in docker/.env}"
+            KC_BOOTSTRAP_ADMIN_PASSWORD: "${KC_BOOTSTRAP_ADMIN_PASSWORD:?set KC_BOOTSTRAP_ADMIN_PASSWORD in docker/.env}"
+            KC_LOG_LEVEL: ${KC_LOG_LEVEL:-info}
+        command: ["start", "--optimized", "--import-realm"]
+        volumes:
+            # Realm import directory. Keycloak imports JSON files only on first
+            # startup / when the realm does not exist (strategy IGNORE_EXISTING).
+            # Do not put unrelated files in keycloak/.
+            - ../keycloak:/opt/keycloak/data/import:ro
+        depends_on:
+            postgres:
+                condition: service_healthy
+        expose:
+            - "8080"
+            - "9000" # management/health, intentionally not published
+        healthcheck:
+            # Keycloak 26 health endpoints live on the management port 9000.
+            # bash is present in the image (kc.sh requires it).
+            test:
+                [
+                    "CMD",
+                    "bash",
+                    "-c",
+                    "{ printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3; } 3<>/dev/tcp/127.0.0.1/9000"
+                ]
+            interval: 15s
+            timeout: 5s
+            retries: 20
+            start_period: 90s
+        logging:
+            driver: json-file
+            options:
+                max-size: "50m"
+                max-file: "10"
+
+    site:
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.site
+        image: seezn-id/site:${SITE_IMAGE_TAG:-1.0.0}
+        restart: unless-stopped
+        ports:
+            # Bind to loopback only; the host TLS terminator proxies to this.
+            # Change to 0.0.0.0:8080 only if the host firewall protects it.
+            - "${SITE_HTTP_BIND:-127.0.0.1:8080}:80"
+        depends_on:
+            keycloak:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+            interval: 30s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+        logging:
+            driver: json-file
+            options:
+                max-size: "20m"
+                max-file: "10"
+
+volumes:
+    pgdata:

@@ -7,6 +7,9 @@ export default defineConfig({
     plugins: [
         react(),
         keycloakify({
+            // Registered theme name inside the JAR; also the value to pick in
+            // Realm Settings → Themes → Login theme.
+            themeName: "seezn-id",
             accountThemeImplementation: "none"
         })
     ]

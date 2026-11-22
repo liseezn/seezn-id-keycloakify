@@ -58,3 +58,15 @@ jspm_packages
 
 # build output of `jsx-email`
 /.rendered
+
+# Build outputs / local toolchain (not committed)
+/tools
+/artifacts/tmp
+
+# Acceptance/build evidence (uploaded by CI instead)
+/test-results
+/playwright-report
+/artifacts
+
+# Local deployment secrets
+docker/.env

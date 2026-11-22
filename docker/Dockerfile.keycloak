@@ -1,0 +1,60 @@
+# syntax=docker/dockerfile:1
+
+# SeeZn ID authentication image.
+#
+# Base image is pinned to the version in docs/ARCHITECTURE.md. Do not float it:
+# the Keycloakify theme JAR is only verified against Keycloak 26.8.x.
+ARG KEYCLOAK_IMAGE=quay.io/keycloak/keycloak:26.8.2
+
+# ---------------------------------------------------------------------------
+# Stage 1 — validate the theme JAR before it enters the runtime image.
+#
+# The JAR comes from the build context, which gives two supported workflows:
+#   local:  npm run build-keycloak-theme
+#           docker compose ... build   (uses dist_keycloak/keycloak-theme-for-kc-all-other-versions.jar)
+#   CI:     download the release asset next to the repo or pass
+#           --build-arg THEME_JAR=/path/in/context/theme.jar (path must be inside the context)
+#
+# Keycloak only activates a theme whose registered name matches `loginTheme` in
+# keycloak/realm-seezn.json. Keycloakify's default name is "<package>-keycloakify",
+# so a stale/misconfigured build silently falls back to the stock theme. Fail the
+# image build instead of shipping that.
+# ---------------------------------------------------------------------------
+FROM python:3-alpine AS theme-check
+
+ARG THEME_JAR=dist_keycloak/keycloak-theme-for-kc-all-other-versions.jar
+
+COPY ${THEME_JAR} /tmp/theme.jar
+
+# Use Python's stdlib zipfile instead of unzip, so the validation does not
+# depend on the unzip applet/package being present in the base image.
+RUN python -c 'import json,sys,zipfile; z=zipfile.ZipFile("/tmp/theme.jar"); t=json.loads(z.read("META-INF/keycloak-themes.json")); names=[x.get("name") for x in t.get("themes",[])]; print("registered login themes:", names); missing="theme/seezn-id/login/theme.properties" not in z.namelist(); sys.exit("ERROR: theme JAR must register exactly \"seezn-id\" and contain theme/seezn-id/login/theme.properties; rebuild with npm run build-keycloak-theme" if ("seezn-id" not in names or missing) else 0)'
+
+# ---------------------------------------------------------------------------
+# Stage 2 — runtime image.
+# ---------------------------------------------------------------------------
+FROM ${KEYCLOAK_IMAGE}
+
+USER root
+
+# One JAR only. Keycloakify 11 emits
+#   keycloak-theme-for-kc-22-to-25.jar          -> Keycloak 22..25
+#   keycloak-theme-for-kc-all-other-versions.jar-> all other versions (incl. 26.x)
+# KC 26.8.2 therefore uses the "all other versions" JAR (verified on 26.8.2).
+COPY --from=theme-check --chown=keycloak:keycloak /tmp/theme.jar /opt/keycloak/providers/seezn-id-theme.jar
+
+# Build as the image's non-root Keycloak user (the default runtime user) so the
+# generated Quarkus files stay readable at runtime. `kc.sh build` is required
+# here, but not to discover the theme itself: theme resources are read at runtime
+# from /opt/keycloak/providers. The build is needed because the container starts
+# with `start --optimized`, and because Keycloak 26 treats `kc.db` as a build-time
+# option. Building with KC_DB=postgres bakes the PostgreSQL driver choice;
+# starting optimized later with a different kc.db fails with
+# "build time options ... differ". Verified on Keycloak 26.8.2.
+USER keycloak
+ENV KC_DB=postgres
+ENV KC_HEALTH_ENABLED=true
+RUN /opt/keycloak/bin/kc.sh build --health-enabled=true
+
+# Compose overrides the command to add --import-realm; the image works stand-alone too.
+CMD ["start", "--optimized"]

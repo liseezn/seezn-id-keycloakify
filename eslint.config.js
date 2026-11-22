@@ -15,7 +15,17 @@ export default typescriptEslint.config(
   eslintConfigPrettier,
   ...storybook.configs["flat/recommended"],
   {
-    ignores: ["dist/**", "public/**"],
+    ignores: [
+      "dist/**",
+      "dist-site/**",
+      "dist_keycloak/**",
+      "public/**",
+      "tools/**",
+      "artifacts/**",
+      "test-results/**",
+      "playwright-report/**",
+      "scripts/extract-legal-content.mjs",
+    ],
   },
   {
     plugins: {
@@ -37,6 +47,20 @@ export default typescriptEslint.config(
       "react-hooks/exhaustive-deps": "off",
       "@typescript-eslint/no-redeclare": "off",
       "no-labels": "off",
+    },
+  },
+  {
+    files: [
+      "tests/**/*.{ts,mjs}",
+      "scripts/**/*.mjs",
+      "vite.config.ts",
+      "vite.site.config.ts",
+      "tests/e2e/playwright.config.ts",
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
   {

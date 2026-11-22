@@ -1,0 +1,77 @@
+{
+  "realm": "seezn",
+  "displayName": "SeeZn ID",
+  "enabled": true,
+  "sslRequired": "external",
+  "loginTheme": "seezn-id",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["en", "zh-CN"],
+  "defaultLocale": "en",
+  "registrationAllowed": true,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "verifyEmail": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "editUsernameAllowed": false,
+  "passwordPolicy": "length(8)",
+  "smtpServer": {
+    "host": "localhost",
+    "port": "1025",
+    "from": "no-reply@liseezn.top",
+    "fromDisplayName": "SeeZn ID",
+    "replyTo": "no-reply@liseezn.top",
+    "replyToDisplayName": "SeeZn ID",
+    "envelopeFrom": "no-reply@liseezn.top",
+    "auth": "false",
+    "ssl": "false",
+    "starttls": "false"
+  },
+  "clients": [
+    {
+      "clientId": "seezn-portal",
+      "name": "SeeZn Portal",
+      "description": "Public web portal (liseezn.top) using the authorization code flow.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "https://liseezn.top/*",
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "https://liseezn.top",
+        "http://localhost:3000"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://liseezn.top/*"
+      }
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "google",
+      "displayName": "Google",
+      "providerId": "google",
+      "enabled": true,
+      "trustEmail": true,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": false,
+      "authenticateByDefault": false,
+      "linkOnly": false,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "config": {
+        "clientId": "GOOGLE_CLIENT_ID_PLACEHOLDER",
+        "clientSecret": "GOOGLE_CLIENT_SECRET_PLACEHOLDER",
+        "defaultScope": "openid email profile",
+        "syncMode": "IMPORT",
+        "useJwksUrl": "true"
+      }
+    }
+  ]
+}
