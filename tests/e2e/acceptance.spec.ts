@@ -230,7 +230,7 @@ test.describe("public pages", () => {
         await page.goto(`${SITE}/terms.html`, { waitUntil: "domcontentloaded" });
         await expect(page.locator('main div[lang="en"] h2')).toHaveCount(16);
         await expect(page.locator('main div[lang="zh"] h2')).toHaveCount(16);
-        await page.locator('[data-lang="zh"]').click();
+        await page.locator('.sz-lang button[data-l="zh"]').click();
         await expect(page.locator("main h1").first()).toHaveText("服务条款");
 
         await page.goto(`${SITE}/privacy.html`, { waitUntil: "domcontentloaded" });

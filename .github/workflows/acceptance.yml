@@ -109,13 +109,13 @@ jobs:
           visit(report);
           if (lines.length === 0) {
             console.log("::error title=playwright::No report details found");
+          } else if (lines.length === 1) {
+            console.log(lines[0]);
           } else {
-            console.log(lines.join("\n"));
+            // Keep annotations small: only the first failure is usually the root cause.
+            console.log(lines[0]);
+            console.log(`::warning title=playwright::${lines.length - 1} more failure(s) omitted from annotations`);
           }
-          try {
-            const tail = fs.readFileSync("/tmp/e2e.log", "utf8").split(/\r?\n/).slice(-60).join(" | ");
-            console.log(`::error title=E2E_LOG_TAIL::${tail.slice(-6000)}`);
-          } catch {}
           NODE
 
       - name: Upload report
