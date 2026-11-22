@@ -187,11 +187,12 @@ test.describe("authentication", () => {
         await expect.poll(() => pageId(page), { timeout: 30_000 }).toBe("login-config-totp.ftl");
         console.log("TOTP: config page", page.url());
 
+        await page.waitForSelector("#mode-manual, #kc-totp-secret-key", { timeout: 30_000 });
         if (await page.locator("#mode-manual").count()) {
             console.log("TOTP: switching to manual mode");
             await page.locator("#mode-manual").click();
-            await page.waitForSelector("#kc-totp-secret-key");
         }
+        await page.waitForSelector("#kc-totp-secret-key", { state: "visible", timeout: 30_000 });
         const secret = (await page.locator("#kc-totp-secret-key").innerText()).trim();
         console.log("TOTP: secret length", secret.length);
         await page.fill("#totp", totp(secret));
