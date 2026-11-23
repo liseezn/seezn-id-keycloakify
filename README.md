@@ -24,7 +24,7 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 | JDK / Maven | 21 / 3.9（主题 JAR 由 Maven 打包） |
 | 主题名 | `seezn-id` |
 | Realm | `seezn` |
-| 当前版本 | `1.0.1` |
+| 当前版本 | `1.0.2` |
 
 ## 功能范围
 
@@ -46,7 +46,7 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 
 **公共站点**（`public-site/**`）
 
-- `/`、`/terms`、`/privacy` 三个静态页面（无 `.html` 后缀）与统一 404 页，中英双语、深浅色、响应式，内容与批准的原稿一致
+- `/`、`/terms`、`/privacy` 三个静态页面（无 `.html` 后缀）与统一 SeeZn 404 页，中英双语、深浅色、响应式，内容与批准的原稿一致
   （条款 16 章、隐私政策 16 章与 4 张表格）。
 - 三页共用 `public-site/assets/seezn.css`、`seezn.js` 与 `tokens.css`，头部/页脚与认证主题视觉统一。
 - 首页只有点击按钮才进入认证流程；nginx 直接托管，无需前端构建。

@@ -63,6 +63,18 @@ jobs:
           path: dist_keycloak/*.jar
           if-no-files-found: error
 
+      - name: Package static site
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          tar -czf "dist_keycloak/seezn-id-public-site-${VERSION}.tar.gz" public-site docker/nginx.conf
+
+      - name: Upload static site
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-site
+          path: dist_keycloak/seezn-id-public-site-*.tar.gz
+          if-no-files-found: error
+
   check_if_version_upgraded:
     name: Check if version was upgraded
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -94,6 +106,12 @@ jobs:
           name: keycloak-theme
           path: dist_keycloak
 
+      - name: Download static site
+        uses: actions/download-artifact@v4
+        with:
+          name: public-site
+          path: dist_keycloak
+
       - uses: softprops/action-gh-release@v2
         with:
           name: Release v${{ needs.check_if_version_upgraded.outputs.to_version }}
@@ -102,4 +120,6 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: ${{ needs.check_if_version_upgraded.outputs.is_pre_release == 'true' }}
-          files: dist_keycloak/*.jar
+          files: |
+            dist_keycloak/*.jar
+            dist_keycloak/seezn-id-public-site-*.tar.gz
