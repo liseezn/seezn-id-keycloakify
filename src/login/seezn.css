@@ -313,6 +313,34 @@ html.login-pf body.seezn-body {
     text-decoration: underline;
 }
 
+/* Keycloak fallback pages (e.g. IdP link confirmation) use the stock
+   form action container. Keep confirm/cancel horizontal and equal width. */
+#kc-form-buttons,
+.pf-c-form__actions,
+.pf-v5-c-form__actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+}
+
+#kc-form-buttons > *,
+.pf-c-form__actions > *,
+.pf-v5-c-form__actions > * {
+    flex: 0 1 auto;
+    min-width: 0;
+    justify-content: center;
+}
+
+/* Two actions (confirm/cancel, link/cancel) share the row equally. */
+#kc-form-buttons:has(> :nth-child(2)) > *,
+.pf-c-form__actions > *,
+.pf-v5-c-form__actions > * {
+    flex: 1 1 0;
+    max-width: 180px;
+}
+
 .sz-form-actions {
     display: flex;
     gap: 10px;
@@ -797,7 +825,7 @@ input[type="submit"]:not(.pf-m-secondary):hover {
     margin-top: 20px;
 }
 
-#kc-form-buttons input[type="submit"] {
+#kc-form-buttons > input[type="submit"]:only-child {
     width: 100%;
 }
 
