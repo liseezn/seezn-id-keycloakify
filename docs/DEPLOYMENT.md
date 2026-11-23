@@ -163,7 +163,7 @@ docker build -f docker/Dockerfile.keycloak \
 ### 4.2 站点镜像
 
 ```bash
-docker build -f docker/Dockerfile.site -t seezn-id/site:1.0.4 .
+docker build -f docker/Dockerfile.site -t seezn-id/site:1.0.5 .
 ```
 
 Dockerfile 会复制 `public-site/` 和 `docker/nginx.conf`，并执行 `nginx -t`；配置错误会让

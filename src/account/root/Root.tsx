@@ -58,6 +58,9 @@ function CatchAllRedirect() {
 }
 
 function AccountLayout() {
+    const { i18n } = useTranslation();
+    const zh = (i18n.language || "").toLowerCase().startsWith("zh");
+
     return (
         <div className="sz-account-shell">
             <Header />
@@ -69,6 +72,11 @@ function AccountLayout() {
             </main>
             <footer className="sz-account-footer">
                 <span>© 2026 SeeZn ID</span>
+                <nav aria-label="SeeZn ID">
+                    <a href="/">{zh ? "首页" : "Home"}</a>
+                    <a href="/privacy">{zh ? "隐私政策" : "Privacy"}</a>
+                    <a href="/terms">{zh ? "服务条款" : "Terms"}</a>
+                </nav>
             </footer>
         </div>
     );

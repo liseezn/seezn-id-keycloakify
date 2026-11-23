@@ -94,6 +94,10 @@ test.describe("authentication", () => {
         await expect(page.locator(".sz-account-user")).toBeVisible();
         await expect(page.locator(".sz-account-nav")).toBeVisible();
         await expect(page.locator(".sz-account-footer")).toContainText("2026 SeeZn ID");
+        await expect(page.locator('.sz-account-footer a[href="/privacy"]')).toBeVisible();
+        await expect(page.locator('.sz-account-footer a[href="/terms"]')).toBeVisible();
+        await expect(page.locator('.sz-account-footer a[href="/"]')).toBeVisible();
+        await expect(page.locator('.sz-account-nav a[href="/"]')).toBeVisible();
         expect(await page.locator(".sz-account-nav-item").count()).toBeGreaterThan(2);
         expect(await page.locator(".pf-v5-c-page__sidebar").count()).toBe(0);
 

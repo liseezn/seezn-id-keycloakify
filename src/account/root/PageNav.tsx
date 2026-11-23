@@ -20,6 +20,7 @@ import {
     Building2,
     ChevronDown,
     FolderOpen,
+    Home,
     Menu,
     ShieldCheck,
     UserRound,
@@ -146,6 +147,16 @@ export const PageNav = () => {
                         id="sz-account-nav-list"
                         className={`sz-account-nav-list${isMenuOpen ? " is-open" : ""}`}
                     >
+                        <li>
+                            <a
+                                className="sz-account-nav-item"
+                                href="/"
+                                onClick={closeAll}
+                            >
+                                <Home size={16} />
+                                <span>{zh ? "首页" : "Home"}</span>
+                            </a>
+                        </li>
                         {visibleItems?.map(menuItem => {
                             if ("children" in menuItem) {
                                 const children = menuItem.children.filter(child =>
