@@ -17,8 +17,7 @@ export default defineConfig({
     ],
     globalSetup: path.join(here, "setup.mjs"),
     webServer: {
-        command:
-            "python3 -m http.server 5174 --bind 127.0.0.1 --directory public-site",
+        command: "node tests/e2e/static-server.mjs",
         url: "http://127.0.0.1:5174/",
         reuseExistingServer: true,
         timeout: 30_000,

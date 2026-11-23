@@ -2,7 +2,7 @@
 
 面向运维/发布执行人。事实基线以 `docs/ARCHITECTURE.md` 为准：Keycloak **26.8.2**、Realm
 **seezn**、认证域名 **https://auth.liseezn.top**、登录主题 **seezn-id**、公共站点
-**public-site/**（`index.html` / `terms.html` / `privacy.html`，静态 HTML）。
+**public-site/**（`index.html` / `terms.html` / `privacy.html` / `404.html`，静态 HTML；对外 clean URL `/`、`/terms`、`/privacy`）。
 
 本手册中的“已实测”指在 Keycloak 26.8.2 发行包上实际执行过；标注“未实测”的部分
 （Docker/nginx 构建、真实 Google 凭据、SMTP 投递、TLS 代理）必须在目标主机上验收。
@@ -16,7 +16,7 @@
   │  HTTPS 443（证书在宿主机反代 / Caddy / Traefik 终止）
   ▼
 宿主机反代 ──► 127.0.0.1:8080  site 容器（nginx:alpine）
-                                ├─ /、/terms.html、/privacy.html  ← public-site/
+                                ├─ /、/terms、/privacy、404      ← public-site/
                                 ├─ favicon-32x32.png              ← public-site/
                                 └─ /realms/、/resources/、/admin/、/js/、/robots.txt
                                         │ 反向代理（HTTP 8080）
@@ -28,7 +28,7 @@
 ```
 
 - 浏览器只看到 `https://auth.liseezn.top` 一个源，登录页与法务页同源（主题里的
-  `/terms.html`、`/privacy.html` 链接因此可用）。
+  `/terms`、`/privacy` 链接因此可用）。
 - Keycloak 的 8080/9000 **不发布到宿主机**；只有 site 容器发布到回环地址。
 - Realm 数据在 Postgres；主题 JAR 在 Keycloak 镜像的 `/opt/keycloak/providers/`。
 
@@ -59,7 +59,7 @@ Keycloak 与 JAR 版本必须匹配：Keycloak 固定 `quay.io/keycloak/keycloak
 ### 3.1 公共站点（public-site/）
 
 ```bash
-ls public-site/          # index.html terms.html privacy.html favicon-32x32.png
+ls public-site/          # index.html terms.html privacy.html 404.html favicon-32x32.png
 ls public-site/assets/   # tokens.css seezn.css seezn.js（与主题共用令牌）
 ```
 
@@ -640,7 +640,7 @@ echo $?    # 0
 
 默认检查 `https://auth.liseezn.top`：
 
-- `/`、`/terms.html`、`/privacy.html` 均 200 且返回 HTML；
+- `/`、`/terms`、`/privacy` 均 200 且返回 HTML；未知路径返回 404 与 SeeZn 404 页；
 - `/realms/seezn/.well-known/openid-configuration` 200，issuer/authorization_endpoint 合理；
 - 授权端点渲染登录页，资源路径包含 `/login/seezn-id/`；
 - Google 按钮的 broker 跳转 303 到 `accounts.google.com`，且
@@ -731,7 +731,7 @@ SITE_URL=http://127.0.0.1:8080 AUTH_URL=http://127.0.0.1:8099 \
 - Docker 构建上下文是否是仓库根（`docker/Dockerfile.site` 的 `COPY public-site/`）；
 - `docker compose exec site ls /usr/share/nginx/html`；
 - 不要给多页站点加 SPA `try_files ... /index.html` 兜底：未知路径应保持 404；
-- `/index.html` 与 `/` 都应能打开，但对外链接使用 `/`、`/terms.html`、`/privacy.html`。
+- 对外链接使用 `/`、`/terms`、`/privacy`；旧 `.html` 链接 301 到 clean URL，未知路径保留 404。
 
 ### 15.3 Google `redirect_uri_mismatch` / 回调错误
 

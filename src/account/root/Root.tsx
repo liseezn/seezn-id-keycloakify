@@ -75,9 +75,9 @@ function AccountLayout() {
             <footer className="sz-account-footer">
                 <span>© 2026 SeeZn ID</span>
                 <nav aria-label="SeeZn ID">
-                    <a href={`${SITE_ORIGIN}/index.html`}>{zh ? "首页" : "Home"}</a>
-                    <a href={`${SITE_ORIGIN}/terms.html`}>{zh ? "服务条款" : "Terms"}</a>
-                    <a href={`${SITE_ORIGIN}/privacy.html`}>{zh ? "隐私政策" : "Privacy"}</a>
+                    <a href={`${SITE_ORIGIN}/`}>{zh ? "首页" : "Home"}</a>
+                    <a href={`${SITE_ORIGIN}/terms`}>{zh ? "服务条款" : "Terms"}</a>
+                    <a href={`${SITE_ORIGIN}/privacy`}>{zh ? "隐私政策" : "Privacy"}</a>
                     <a href="mailto:mail@liseezn.top">mail@liseezn.top</a>
                 </nav>
             </footer>

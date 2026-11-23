@@ -36,7 +36,7 @@
 | Keycloakify | `11.16.x`（实测 `11.16.0`） |
 | Realm / 域名 | `seezn` / `https://auth.liseezn.top` |
 | 登录主题名 | `seezn-id`（`vite.config.ts` 与 Realm 导入文件一致） |
-| 公共站点 | `/`、`/terms.html`、`/privacy.html`（nginx 静态托管） |
+| 公共站点 | `/`、`/terms`、`/privacy`（nginx 静态托管，无 `.html` 后缀） |
 | 事实来源 | `docs/ARCHITECTURE.md`、仓库代码与配置、Keycloak 26 官方文档 |
 
 **核验口径**：与 `docs/ARCHITECTURE.md` 冲突时以 ARCHITECTURE 为准，并在 §13.2 指出差异。“已核验”指可在仓库文件或命令输出中复核；“待验证”指尚无实测证据，不得记为通过。主题 JAR 注册名为 `seezn-id`，构建脚本与 Playwright 套件已就绪；按项目约定，验收不在开发机本地启动项目，统一在手动触发的 `acceptance.yml` 或 staging Docker 执行，生产部署、真实 Google 回调、真实 SMTP 与 90 天日志保留仍待验证/落实。
@@ -61,7 +61,7 @@
                           HTTPS 443
   ┌────────┐        ┌───────────────────────────────────────────────┐
   │ 浏览器 │───────▶│ nginx（auth.liseezn.top）                      │
-  └────────┘        │  ├─ /, /index.html, /terms.html, /privacy.html │
+  └────────┘        │  ├─ /, /terms, /privacy, 404              │
                     │  │     /favicon 等       → public-site 静态文件  │
                     │  └─ /realms/*, /resources/*, /admin/*, /js/*   │
                     │        → http://keycloak:8080                 │
@@ -100,13 +100,13 @@
 
 ### 3.1 为什么必须由 nginx 提供
 
-Keycloak 只提供主题化认证页、账户控制台与管理控制台，**没有** `/index.html`、`/terms.html`、`/privacy.html` 路由。这三个页面是静态 HTML（`public-site/`），由 nginx 直接返回，不经过前端构建；站点与 Keycloak 同域，登录页页脚与站点互链无需跨域，品牌与 Cookie 作用域一致。nginx 是唯一公网入口（443），Keycloak 只在内网监听。
+Keycloak 只提供主题化认证页、账户控制台与管理控制台，**没有** `/`、`/terms`、`/privacy` 路由。这几个页面是静态 HTML（`public-site/`），由 nginx 直接返回，不经过前端构建；对外使用无 `.html` 后缀的 clean URL，nginx 内部映射到文件，未知路径返回 SeeZn 404。站点与 Keycloak 同域，登录页页脚与站点互链无需跨域，品牌与 Cookie 作用域一致。nginx 是唯一公网入口（443），Keycloak 只在内网监听。
 
 ### 3.2 关键 URL 的语义
 
 | URL | 归属 | 语义 | 需登录 |
 | --- | --- | --- | --- |
-| `/`、`/index.html`、`/terms.html`、`/privacy.html` | nginx | 公共站点 | 否 |
+| `/`、`/terms`、`/privacy`、任意未知路径 | nginx | 公共站点 / SeeZn 404 | 否 |
 | `/realms/seezn/account/` | Keycloak | **账户控制台**；未登录先跳登录 | 是 |
 | `/realms/seezn/protocol/openid-connect/auth` | Keycloak | **OIDC 授权端点**，应用从这里发起登录 | 否 |
 | `/realms/seezn/broker/google/endpoint` | Keycloak | Google 回调端点 | 否 |
@@ -183,7 +183,7 @@ src/
     theme.ts               # 设计令牌 + MUI 主题工厂
     useColorMode.ts        # 跟随系统深浅色
 public-site/               # 公共三页（静态 HTML，原批准设计稿）
-  index.html terms.html privacy.html favicon-32x32.png
+  index.html terms.html privacy.html 404.html favicon-32x32.png
   assets/tokens.css        # 共享设计令牌（主题与站点共同 @import）
   assets/seezn.css         # 站点布局、统一头部/页脚、语言切换
   assets/seezn.js          # 语言切换与 lucide 初始化
@@ -307,7 +307,7 @@ Realm 已启用国际化：`supportedLocales = ["en", "zh-CN"]`，`defaultLocale
 | 认证页 SeeZn 文案 | `src/login/copy.ts`（zh/en 标题、副标题、按钮） |
 | 认证页字段标签 | `src/login/components/*`、页面组件 |
 | 公共站点文案 | `public-site/*.html` 内的 `lang=zh/en` 双份内容 |
-| 法务正文 | `public-site/terms.html`、`privacy.html`（批准原稿，静态） |
+| 法务正文 | `public-site/terms.html`、`privacy.html`（批准原稿，静态；对外 `/terms`、`/privacy`） |
 
 认证页以 Realm 默认 `en` 兜底；当浏览器 `Accept-Language` 为 `zh-CN`、且未被用户选择/资料/Cookie 覆盖时可进入中文，用户切换结果由 Keycloak 记住。公共站点顺序：`?lang=zh|en` → `localStorage["seezn-lang"]` → `navigator.language`（`zh*`→中文）→ 英文；页面脚本同步 `<html lang>` 与 `document.title`。
 
@@ -525,7 +525,7 @@ V2.0 起，断言型 Playwright 套件已落在 `tests/e2e/acceptance.spec.ts`�
 | T10 | 原功能不回归 | Passkey、IdP 关联、更新资料、注销 | 回退页面可用，流程不中断 | 待 staging 人工抽测 |
 | T11 | 构建产物 | `npm ci`、lint、typecheck、build-keycloak-theme | 全部成功；JAR 注册名 `seezn-id`；`public-site/` 三页存在 | CI 通过（run 13） |
 | T12 | 账号中心 | 登录后访问 `/realms/seezn/account/` | SeeZn 品牌外壳、横向导航、功能可用、移动端/暗色正常 | CI 通过（run 13） |
-| T13 | 公共站点三页 | Playwright 打开 `/`、`/terms.html`、`/privacy.html` | 无需登录、16 章齐全、语言/暗色/移动端无溢出 | CI 通过（run 13） |
+| T13 | 公共站点三页 | Playwright 打开 `/`、`/terms`、`/privacy` 与未知路径 | 无后缀可访问、16 章齐全、404 页面正常、语言/暗色/移动端无溢出 | 待重跑（clean URL/404） |
 
 ### 11.3 执行环境与证据
 
@@ -579,7 +579,7 @@ React 默认转义；Keycloak 消息按 `kcSanitize` 语义渲染，禁止 `dang
 
 | # | V1.0 的问题 | V2.0 修正 | 依据 |
 | --- | --- | --- | --- |
-| 1 | 误以为 Keycloak 提供 `/index.html`、`/terms.html`、`/privacy.html` | 三页由 nginx 静态托管 `public-site/`；Keycloak 无此路由 | §3.1、`docker/nginx.conf` |
+| 1 | 误以为 Keycloak 提供 `/`、`/terms`、`/privacy` | 三页由 nginx 静态托管 `public-site/`；Keycloak 无此路由 | §3.1、`docker/nginx.conf` |
 | 2 | 目录结构虚构 `src/pages`、`src/theme` | 实际为 `src/login/{pages,components}`、`src/shared/theme.ts`、`public-site/**` | §4.2 |
 | 3 | 把 `/realms/seezn/account/` 当作 OIDC 登录入口 | 它是账户控制台；应用用 `/protocol/openid-connect/auth` | §3.2–3.3 |
 | 4 | 构建产物命名/路径不准确 | 实际为 `dist_keycloak/keycloak-theme-for-kc-22-to-25.jar` 与 `...-all-other-versions.jar`；KC26 用后者 | §9.2 |
@@ -608,8 +608,9 @@ React 默认转义；Keycloak 消息按 `kcSanitize` 语义渲染，禁止 `dang
 
 | URL | 方法 | 归属 | 说明 |
 | --- | --- | --- | --- |
-| `/`、`/index.html` | GET | nginx | 首页 |
-| `/terms.html`、`/privacy.html` | GET | nginx | 服务条款 / 隐私政策 |
+| `/` | GET | nginx | 首页 |
+| `/terms`、`/privacy` | GET | nginx | 服务条款 / 隐私政策 |
+| 任意未知路径 | GET | nginx | SeeZn 404（HTTP 404） |
 | `/assets/*` | GET | nginx | 站点 JS/CSS/字体 |
 | `/realms/seezn/account/` | GET | Keycloak | 账户控制台（需登录） |
 | `/realms/seezn/protocol/openid-connect/auth` | GET | Keycloak | OIDC 授权 |

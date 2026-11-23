@@ -19,9 +19,9 @@
 | T08 | MFA | CONFIGURE_TOTP 绑定（TOTP 计算）→ 二次登录 OTP 校验成功 | `acceptance.spec.ts` |
 | T09 | 错误页语义 | 未知 client 触发 `error.ftl`，展示 Keycloak 原始错误 | `acceptance.spec.ts` |
 | T10 | 账号中心 | 登录后访问 `/realms/seezn/account/`，断言 SeeZn 顶栏/横向导航/页脚、移动端无溢出、暗色截图 | `acceptance.spec.ts` |
-| T11 | 公共站点首页 | 无自动跳转、登录按钮指向 `/realms/seezn/account/`、语言与暗色可用 | `public-site/index.html` + `verify-deployment.sh` |
-| T12 | 服务条款 | 中英各 16 章、生效日期、移动端无溢出 | `public-site/terms.html` + `verify-deployment.sh` |
-| T13 | 隐私政策 | 中英各 16 章、≥4 张表格、移动端无溢出 | `public-site/privacy.html` + `verify-deployment.sh` |
+| T11 | 公共站点首页 | 无自动跳转、登录按钮指向 `/realms/seezn/account/`、语言与暗色可用 | `/` + `verify-deployment.sh` |
+| T12 | 服务条款 | `/terms` 无后缀可访问、中英各 16 章、移动端无溢出 | `/terms` + `verify-deployment.sh` |
+| T13 | 隐私政策 | `/privacy` 无后缀可访问、中英各 16 章、≥4 张表格、移动端无溢出 | `/privacy` + `verify-deployment.sh` |
 | T14 | 页脚与公开访问 | 条款/隐私/联系邮箱链接可直接访问 | `verify-deployment.sh` |
 
 补充检查（非 E2E）：

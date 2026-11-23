@@ -46,7 +46,7 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 
 **公共站点**（`public-site/**`）
 
-- `/`、`/terms.html`、`/privacy.html` 三个静态页面，中英双语、深浅色、响应式，内容与批准的原稿一致
+- `/`、`/terms`、`/privacy` 三个静态页面（无 `.html` 后缀）与统一 404 页，中英双语、深浅色、响应式，内容与批准的原稿一致
   （条款 16 章、隐私政策 16 章与 4 张表格）。
 - 三页共用 `public-site/assets/seezn.css`、`seezn.js` 与 `tokens.css`，头部/页脚与认证主题视觉统一。
 - 首页只有点击按钮才进入认证流程；nginx 直接托管，无需前端构建。
@@ -82,7 +82,7 @@ npm run build-keycloak-theme  # -> dist_keycloak/*.jar（login + account，需�
 
 ```bash
 npm run dev        # Keycloak 主题前端（需 mock kcContext 或 Keycloakify dev 流程）
-# 公共站点是静态 HTML，直接在浏览器打开 public-site/index.html，或用任意静态服务器
+# 公共站点是静态 HTML；clean URL/404 需要服务器，请用 docker/Dockerfile.site 或任意静态服务器
 ```
 
 ## 部署

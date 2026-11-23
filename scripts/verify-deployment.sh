@@ -54,13 +54,33 @@ http_get() { # url out-file -> prints status code
 # ---------------------------------------------------------------------------
 section "Public site pages (${SITE_URL})"
 # ---------------------------------------------------------------------------
-for path in "/" "/terms.html" "/privacy.html"; do
+for path in "/" "/terms" "/privacy"; do
     body="$TMP_DIR/page$(printf '%s' "$path" | tr '/.' '__').html"
     code="$(http_get "${SITE_URL}${path}" "$body")"
     if [[ "$code" == "200" ]] && grep -qi '<html' "$body"; then
         pass "GET ${SITE_URL}${path} -> 200 (HTML)"
     else
         fail "GET ${SITE_URL}${path} -> ${code} (expected 200 HTML)"
+    fi
+done
+
+# Unknown paths must stay 404 and render the SeeZn 404 page.
+body="$TMP_DIR/page-404.html"
+code="$(http_get "${SITE_URL}/this-page-does-not-exist" "$body")"
+if [[ "$code" == "404" ]] && grep -qiE '页面不存在|Page not found' "$body"; then
+    pass "GET ${SITE_URL}/this-page-does-not-exist -> 404 (SeeZn 404 page)"
+else
+    fail "GET unknown path -> ${code} (expected 404 with SeeZn 404 page)"
+fi
+
+# Legacy .html links should redirect to canonical clean URLs.
+for pair in "/terms.html:/terms" "/privacy.html:/privacy" "/index.html:/"; do
+    old="${pair%%:*}"; new="${pair##*:}"
+    location="$("${CURL[@]}" -s -o /dev/null -D - "${SITE_URL}${old}" | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r')"
+    if [[ "$location" == *"${new}"* ]]; then
+        pass "GET ${SITE_URL}${old} -> redirect ${new}"
+    else
+        fail "GET ${SITE_URL}${old} -> expected redirect to ${new}, got '${location}'"
     fi
 done
 

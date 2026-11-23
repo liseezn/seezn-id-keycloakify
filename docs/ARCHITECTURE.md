@@ -19,11 +19,11 @@
 | 主题版本 | `1.0.1`（package.json version 驱动） |
 | 构建产物 | `dist_keycloak/keycloak-theme-for-kc-*.jar`（Keycloakify 11 默认双 JAR） |
 | 账号中心 | Keycloakify Single-Page Account UI（`src/account/**`，外壳自有、其余上游生成） |
-| 公共站点 | `public-site/index.html`、`terms.html`、`privacy.html`（静态 HTML，nginx 直接托管） |
+| 公共站点 | `public-site/`：`index.html`、`terms.html`、`privacy.html`、`404.html`；对外 clean URL `/`、`/terms`、`/privacy` |
 
 **重要事实（V1.0 文档错误）**
 
-1. Keycloak 不提供 `/index.html`、`/terms.html`、`/privacy.html`。公共站点必须由
+1. Keycloak 不提供 `/`、`/terms`、`/privacy`（也不提供对应 `.html` 文件）。公共站点必须由
    nginx/静态托管提供，且与 Keycloak 同域才能复用 `auth.liseezn.top`。
 2. `/realms/seezn/account/` 是账户控制台入口，会先跳登录；它不是"登录按钮的 OIDC 入口"。
    业务应用应通过 OIDC 授权端点发起登录。公共站点按钮保留设计稿行为指向
@@ -64,7 +64,7 @@ src/
     theme.ts               # 设计令牌 + MUI 主题工厂
     useColorMode.ts        # 跟随系统深浅色
 public-site/               # 公共三页（静态 HTML，原设计稿）
-  index.html terms.html privacy.html
+  index.html terms.html privacy.html 404.html
   favicon-32x32.png
 docker/                    # 部署资产（compose、Dockerfile、nginx）
 keycloak/                  # realm 导入 JSON
@@ -105,7 +105,7 @@ artifacts/                 # 验收截图与报告（构建产物，git 忽略�
 ## 4. 公共站点策略
 
 - 保留批准原稿的静态 HTML（`public-site/`），不引入第二个 React 应用、不做前端构建。
-- 路由即文件：`/`、`/terms.html`、`/privacy.html`；链接使用绝对路径（与 nginx 部署一致）。
+- 对外路由：`/`、`/terms`、`/privacy`；nginx 内部映射到 `.html` 文件，未知路径返回带 SeeZn 品牌的 404。旧 `.html` 链接 301 到 clean URL。
 - 内容：条款 16 章、隐私政策 16 章与表格原样保留；页面自带中英切换与系统深浅色。
 - 统一外观：三页共用 `public-site/assets/seezn.css` / `seezn.js`，与认证主题共用 `public-site/assets/tokens.css`（主题 `@import` 同一文件）；头部品牌/语言与认证页一致，页脚均为“版权 + 首页/条款/隐私/邮箱”。
 - 资源：字体/图标沿用原稿的 Google Fonts 与 lucide CDN；nginx CSP 相应放行，
