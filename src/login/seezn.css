@@ -72,16 +72,6 @@ html.login-pf body.seezn-body {
     white-space: normal;
 }
 
-#kc-header-wrapper::before {
-    content: "";
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    flex: none;
-    border-radius: 50%;
-    background: var(--sz-accent);
-}
-
 /* Keycloak may render a logo link; keep it visually identical to the wordmark. */
 #kc-logo-wrapper,
 .kc-logo-text {
@@ -159,6 +149,10 @@ html.login-pf body.seezn-body {
 }
 
 #kc-current-locale-link,
+#kc-current-locale-link.pf-c-button,
+#kc-current-locale-link.pf-v5-c-button,
+#kc-locale .pf-c-button,
+#kc-locale .pf-v5-c-button,
 #kc-current-locale-link:focus {
     display: inline-flex;
     align-items: center;
@@ -216,10 +210,16 @@ html.login-pf body.seezn-body {
     list-style: none;
 }
 
+#kc-locale ul,
+#kc-locale ul li {
+    background: var(--sz-surface) !important;
+}
+
 #kc-locale ul a {
     display: block;
     padding: 8px 12px !important;
     border-radius: 8px;
+    background: transparent !important;
     color: var(--sz-text) !important;
     font-size: 0.875rem !important;
     text-align: left !important;

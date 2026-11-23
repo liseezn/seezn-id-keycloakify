@@ -19,8 +19,6 @@ import { Header } from "./Header";
 import { MenuItem, PageNav } from "./PageNav";
 import { routes } from "../routes";
 
-const SITE_ORIGIN = "https://auth.liseezn.top";
-
 function mapRoutes(
     context: KeycloakContext<AccountEnvironment>,
     content: MenuItem[]
@@ -60,9 +58,6 @@ function CatchAllRedirect() {
 }
 
 function AccountLayout() {
-    const { i18n } = useTranslation();
-    const zh = (i18n.language || "").toLowerCase().startsWith("zh");
-
     return (
         <div className="sz-account-shell">
             <Header />
@@ -74,12 +69,6 @@ function AccountLayout() {
             </main>
             <footer className="sz-account-footer">
                 <span>© 2026 SeeZn ID</span>
-                <nav aria-label="SeeZn ID">
-                    <a href={`${SITE_ORIGIN}/`}>{zh ? "首页" : "Home"}</a>
-                    <a href={`${SITE_ORIGIN}/terms`}>{zh ? "服务条款" : "Terms"}</a>
-                    <a href={`${SITE_ORIGIN}/privacy`}>{zh ? "隐私政策" : "Privacy"}</a>
-                    <a href="mailto:mail@liseezn.top">mail@liseezn.top</a>
-                </nav>
             </footer>
         </div>
     );

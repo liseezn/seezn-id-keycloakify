@@ -53,23 +53,138 @@ body {
     position: sticky;
     top: 0;
     z-index: 30;
-}
-
-.sz-account-header .pf-v5-c-masthead {
-    min-height: 60px;
     border-bottom: 1px solid var(--sz-border);
-    background: color-mix(in srgb, var(--sz-bg) 82%, transparent);
+    background: color-mix(in srgb, var(--sz-bg) 84%, transparent);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     backdrop-filter: saturate(180%) blur(20px);
 }
 
-.sz-account-header .pf-v5-c-masthead__brand {
-    padding-block: 10px;
+.sz-account-header-inner {
+    display: flex;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 10px 24px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
 
-.sz-account-header .pf-v5-c-masthead__brand img {
-    height: 28px;
+.sz-account-brand {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    text-decoration: none;
+}
+
+.sz-account-brand img {
+    height: 26px;
     width: auto;
+}
+
+.sz-account-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+/* Compact user menu: avatar + name + logout in one control. */
+.sz-account-user {
+    position: relative;
+    flex: none;
+}
+
+.sz-account-user-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 3px 10px 3px 3px;
+    border: 1px solid var(--sz-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sz-text);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.sz-account-user-summary::-webkit-details-marker {
+    display: none;
+}
+
+.sz-account-user-summary::marker {
+    content: "";
+}
+
+.sz-account-user-summary:hover {
+    background: var(--sz-muted-bg);
+}
+
+.sz-account-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.sz-account-avatar-fallback {
+    background: var(--sz-accent);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.sz-account-user-name {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sz-account-user-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 40;
+    min-width: 180px;
+    padding: 6px;
+    border: 1px solid var(--sz-border);
+    border-radius: 12px;
+    background: var(--sz-surface);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+
+.sz-account-menu-item {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--sz-text);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sz-account-menu-item:hover {
+    background: var(--sz-muted-bg);
+}
+
+/* Any stock account chrome must never render alongside the SeeZn shell. */
+.pf-v5-c-page__sidebar,
+.pf-v5-c-page__sidebar-body,
+.pf-v5-c-masthead {
+    display: none !important;
 }
 
 /* ---------- horizontal navigation ---------- */
@@ -272,10 +387,21 @@ body {
     font-weight: 500;
 }
 
-.pf-v5-c-form-control {
+.pf-v5-c-form-control,
+.pf-v5-c-select__toggle,
+.pf-v5-c-select__toggle-button,
+select {
     border-radius: 10px;
     border-color: var(--sz-border);
-    background: transparent;
+    background-color: var(--sz-surface);
+    color: var(--sz-text);
+}
+
+.pf-v5-c-select__menu,
+.pf-v5-c-menu,
+.pf-v5-c-select__menu-item,
+option {
+    background-color: var(--sz-surface);
     color: var(--sz-text);
 }
 
@@ -454,18 +580,26 @@ body {
         padding: 24px 16px 40px;
     }
 
+    .sz-account-header-actions {
+        gap: 6px;
+    }
+
     .sz-account-main h1 {
         font-size: 1.5rem;
     }
 }
 
 @media (max-width: 480px) {
-    .sz-account-header .pf-v5-c-masthead {
-        min-height: 56px;
+    .sz-account-header-inner {
+        padding: 8px 16px;
     }
 
     .sz-account-nav {
         top: 56px;
+    }
+
+    .sz-account-user-name {
+        display: none;
     }
 
     .sz-account-footer {

@@ -90,10 +90,15 @@ test.describe("authentication", () => {
         await page.waitForTimeout(800);
         await page.goto(`${KC}/realms/seezn/account/`);
         await expect(page).toHaveTitle(/SeeZn ID/);
-        await expect(page.locator(".pf-v5-c-masthead")).toBeVisible();
+        await expect(page.locator(".sz-account-header")).toBeVisible();
+        await expect(page.locator(".sz-account-user")).toBeVisible();
         await expect(page.locator(".sz-account-nav")).toBeVisible();
         await expect(page.locator(".sz-account-footer")).toContainText("2026 SeeZn ID");
         expect(await page.locator(".sz-account-nav-item").count()).toBeGreaterThan(2);
+        expect(await page.locator(".pf-v5-c-page__sidebar").count()).toBe(0);
+
+        await page.locator(".sz-account-user summary").click();
+        await expect(page.locator(".sz-account-menu-item")).toContainText(/Sign out|退出登录/);
 
         await page.setViewportSize({ width: 390, height: 844 });
         expect(
