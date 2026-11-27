@@ -7,6 +7,8 @@
 本手册中的“已实测”指在 Keycloak 26.8.2 发行包上实际执行过；标注“未实测”的部分
 （Docker/nginx 构建、真实 Google 凭据、SMTP 投递、TLS 代理）必须在目标主机上验收。
 
+> 使用 **1Panel Docker 编排** 的读者可直接看 [1Panel 安装、更新与运维教程](1PANEL-THEME-GUIDE.md)，包含 JAR 挂载、公共站点、404 和会话排障。
+
 ---
 
 ## 1. 部署拓扑

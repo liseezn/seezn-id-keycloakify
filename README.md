@@ -111,6 +111,7 @@ npm run dev        # Keycloak 主题前端（需 mock kcContext 或 Keycloakify 
 - [技术文档 V2.0（重写版）](docs/SeeZn-ID-技术文档-v2.md) — 架构、实现、构建、部署、安全、V1.0 问题修正
 - [架构与实现决策](docs/ARCHITECTURE.md)
 - [部署手册](docs/DEPLOYMENT.md)
+- [1Panel 安装、更新与运维教程](docs/1PANEL-THEME-GUIDE.md)
 - [测试与验收](docs/ACCEPTANCE.md)
 
 ## 安全与合规
