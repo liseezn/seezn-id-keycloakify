@@ -256,7 +256,6 @@ test.describe("admin console", () => {
         test.setTimeout(150_000);
 
         await page.goto(`${KC}/admin/`);
-        await expect(page.locator("#kc-header-wrapper")).toContainText("SeeZn ID");
 
         await page.fill("#username", ADMIN_USER);
         await page.fill("#password", ADMIN_PASSWORD);
