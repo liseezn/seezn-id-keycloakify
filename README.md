@@ -24,7 +24,7 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 | JDK / Maven | 21 / 3.9（主题 JAR 由 Maven 打包） |
 | 主题名 | `seezn-id` |
 | Realm | `seezn` |
-| 当前版本 | `1.0.9` |
+| 当前版本 | `1.0.10` |
 
 ## 功能范围
 

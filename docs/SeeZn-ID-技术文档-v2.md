@@ -31,7 +31,7 @@
 | --- | --- |
 | 文档版本 | V2.0（替代 V1.0） |
 | 发布日期 | 2026-11-22 |
-| 适用代码版本 | `1.0.9`（`package.json`） |
+| 适用代码版本 | `1.0.10`（`package.json`） |
 | Keycloak | `26.8.2`（`quay.io/keycloak/keycloak:26.8.2`） |
 | Keycloakify | `11.16.x`（实测 `11.16.0`） |
 | Realm / 域名 | `seezn` / `https://auth.liseezn.top` |

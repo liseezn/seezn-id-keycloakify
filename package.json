@@ -1,6 +1,6 @@
 {
     "name": "seezn-id-keycloakify",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "description": "SeeZn ID Keycloakify login theme and static public pages",
     "repository": {
         "type": "git",

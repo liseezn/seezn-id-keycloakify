@@ -26,6 +26,11 @@ export function AccountErrorPage({ kind = "notFound", embedded = false }: Accoun
     const zh = (i18n.language || "").toLowerCase().startsWith("zh");
     const notFound = kind === "notFound";
 
+    const changeLanguage = (language: string) => {
+        void i18n.changeLanguage(language);
+        document.documentElement.lang = language;
+    };
+
     const content = (
         <section className="sz-account-error" aria-live="polite">
             <span className="sz-account-error-code">
@@ -59,6 +64,22 @@ export function AccountErrorPage({ kind = "notFound", embedded = false }: Accoun
                     <ArrowLeft size={16} aria-hidden="true" />
                     {zh ? "返回账户中心" : "Back to account"}
                 </a>
+            </div>
+            <div className="sz-locale-switch" role="group" aria-label="Language">
+                <button
+                    type="button"
+                    aria-pressed={zh}
+                    onClick={() => changeLanguage("zh-CN")}
+                >
+                    中文
+                </button>
+                <button
+                    type="button"
+                    aria-pressed={!zh}
+                    onClick={() => changeLanguage("en")}
+                >
+                    English
+                </button>
             </div>
         </section>
     );

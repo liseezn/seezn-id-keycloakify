@@ -13,6 +13,11 @@ export const PageNotFoundSection = () => {
     const { i18n } = useTranslation();
     const zh = (i18n.language || "").toLowerCase().startsWith("zh");
 
+    const changeLanguage = (language: string) => {
+        void i18n.changeLanguage(language);
+        document.documentElement.lang = language;
+    };
+
     return (
         <div className="sz-admin-notfound">
             <span className="sz-admin-notfound-code">
@@ -29,6 +34,22 @@ export const PageNotFoundSection = () => {
                 <Home size={16} aria-hidden="true" />
                 {zh ? "返回管理后台" : "Back to admin console"}
             </a>
+            <div className="sz-locale-switch" role="group" aria-label="Language">
+                <button
+                    type="button"
+                    aria-pressed={zh}
+                    onClick={() => changeLanguage("zh-CN")}
+                >
+                    中文
+                </button>
+                <button
+                    type="button"
+                    aria-pressed={!zh}
+                    onClick={() => changeLanguage("en")}
+                >
+                    English
+                </button>
+            </div>
         </div>
     );
 };

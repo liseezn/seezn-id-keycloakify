@@ -125,6 +125,30 @@ body {
     line-height: 1.7;
 }
 
+.sz-admin-notfound .sz-locale-switch {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 22px;
+}
+
+.sz-admin-notfound .sz-locale-switch button {
+    min-height: 32px;
+    padding: 5px 12px;
+    border: 1px solid var(--sz-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sz-muted);
+    font: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+}
+
+.sz-admin-notfound .sz-locale-switch button[aria-pressed="true"] {
+    background: var(--sz-muted-bg);
+    color: var(--sz-text);
+}
+
 @media (max-width: 768px) {
     .sz-admin-version-label {
         display: none;
