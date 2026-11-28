@@ -46,7 +46,7 @@ SeeZn ID 是 SeeZn 旗下统一身份认证服务（Realm `seezn`，认证域名
 
 **公共站点**（`public-site/**`）
 
-- `/`、`/terms`、`/privacy` 三个静态页面（无 `.html` 后缀）与统一 SeeZn 404 页，中英双语、深浅色、响应式，内容与批准的原稿一致
+- `/`、`/terms.html`、`/privacy.html` 三个静态页面（无 `.html` 后缀）与统一 SeeZn 404 页，中英双语、深浅色、响应式，内容与批准的原稿一致
   （条款 16 章、隐私政策 16 章与 4 张表格）。
 - 三页共用 `public-site/assets/seezn.css`、`seezn.js` 与 `tokens.css`，头部/页脚与认证主题视觉统一。
 - 首页只有点击按钮才进入认证流程；nginx 直接托管，无需前端构建。
@@ -104,7 +104,7 @@ npm run dev        # Keycloak 主题前端（需 mock kcContext 或 Keycloakify 
   Keycloak 26.8.2 + Mock SMTP，执行 `npm run test:e2e`；或
 - 在 staging / 生产宿主机按 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md) 用 Docker 执行同一套测试。
 
-2026-11-22 的 CI 验收已通过（run 13，commit `5694595`）：账号中心 SeeZn 外壳、公共三页、登录/注册/重置/TOTP/Google/双语/移动端/暗色。记录见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
+2026-11-22 的 CI 验收已通过（run 13，commit `5694595`）：账号中心/管理员后台 SeeZn 外壳、公共三页、登录/注册/重置/TOTP/Google/双语/移动端/暗色。记录见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
 
 ## 文档
 

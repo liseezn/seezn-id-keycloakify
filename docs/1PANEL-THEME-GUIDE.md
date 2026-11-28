@@ -6,7 +6,7 @@
 >
 > 1. 在 1Panel 中首次安装主题；
 > 2. 后续版本更新与回滚；
-> 3. 公共三页（`/`、`/terms`、`/privacy`）和 404 页的部署；
+> 3. 公共三页（`/`、`/terms.html`、`/privacy.html`）和 404 页的部署；
 > 4. 1Panel 日常管理，以及“页面已过期 / invalid-state”会话问题排查。
 
 ---
@@ -77,7 +77,7 @@ sha256sum seezn-id-theme.jar
 1.0.7 的 SHA256：
 
 ```text
-e724429455545142c997a13f20ce2658912dedfc5b62ae5b3cf73ef9b3e15aa4
+c18063f925e363c1e5150c7dc8ae697e8095765f7de901ea4f39df01e3354d47
 ```
 
 检查是文件而不是目录：
@@ -217,7 +217,7 @@ cp -a docker-compose.yml "backup/docker-compose-$(date +%Y%m%d-%H%M).yml"
 
 ```bash
 curl -fL -o seezn-id-theme.jar.new \
-  https://github.com/liseezn/seezn-id-keycloakify/releases/download/vX.Y.Z/keycloak-theme-for-kc-all-other-versions.jar
+  https://github.com/liseezn/seezn-id-keycloakify/releases/download/v1.0.7/keycloak-theme-for-kc-all-other-versions.jar
 
 sha256sum seezn-id-theme.jar.new
 mv seezn-id-theme.jar.new seezn-id-theme.jar
@@ -289,7 +289,7 @@ docker build -f docker/Dockerfile.site -t seezn-id/site:1.0.7 .
 
 `docker/nginx.conf` 会：
 
-- 静态提供 `/`、`/terms`、`/privacy`、`/404`；
+- 静态提供 `/`、`/terms.html`、`/privacy.html`、`/404`；
 - 把 `/realms/`、`/resources/`、`/admin/`、`/js/`、`/robots.txt` 反代到 `keycloak:8080`；
 - 旧 `.html` 链接 301 到无后缀地址；
 - 未知路径返回带 SeeZn 品牌的 404。
@@ -355,7 +355,34 @@ curl -s -o /dev/null -w '%{http_code} /realms/seezn/\n' https://auth.liseezn.top
 
 ---
 
-## 5. 1Panel 日常管理
+## 5. 管理员后台主题
+
+1.0.7 的 JAR 同时包含 `admin` 类型。启用后，管理员后台使用 SeeZn 品牌界面。
+
+### 5.1 选择 Admin theme
+
+1. 打开 `https://auth.liseezn.top/admin/`；
+2. 左上角切到 **master** realm；
+3. **Realm settings → Themes**；
+4. **Admin theme** = `seezn-id`；
+5. **Login theme** = `seezn-id`（用于管理员登录页）；
+6. Save，刷新管理后台。
+
+> 如果 master 的 Login theme 选不了 `seezn-id`，说明 JAR 没有加载 admin/login 类型；先检查 `META-INF/keycloak-themes.json`。
+>
+> Keycloak 对管理员登录页有额外保护；若 master 的 Login theme 设置后仍是 Keycloak 默认页，请以 **Admin theme** 是否生效为准（后台界面会显示 SeeZn 顶栏和版本号）。
+
+### 5.2 版本号在哪里
+
+- 管理后台右上角显示：`SeeZn ID v1.0.7`；
+- **Realm settings → Themes** 的主题下拉项会带 `SeeZn ID v1.0.7` 描述；
+- 主题版本由 `package.json` 自动注入，升级 JAR 后无需手改。
+
+### 5.3 管理员 404
+
+管理后台未知路径显示 SeeZn 品牌 404，提供“返回管理后台”，不再是默认纯文本 `Page Not Found`。
+
+## 6. 1Panel 日常管理
 
 ### 5.1 固定 Keycloak 镜像
 
@@ -422,7 +449,7 @@ docker builder prune -f
 
 ---
 
-## 6. “页面已过期 / invalid-state” 排查
+## 7. “页面已过期 / invalid-state” 排查
 
 这两个错误通常不是主题导致的，而是**认证会话状态丢失**。
 
@@ -527,13 +554,13 @@ environment:
 
 ---
 
-## 7. 故障排查表
+## 8. 故障排查表
 
 | 现象 | 常见原因 | 处理 |
 | --- | --- | --- |
 | 下拉框没有 `seezn-id` | JAR 是目录、未重建、用错版本 | 查 `docker inspect` Mounts 和 `ls -lh`，重建容器 |
 | 页面还是旧主题 | JAR 未替换、浏览器缓存 | 无痕窗口，确认容器内 JAR 时间/大小 |
-| `/terms` `/privacy` 404 | 公共站点未部署 | 增加 site 服务，1Panel 反代切到 8090 |
+| `/terms.html` `/privacy.html` 404 | 公共站点未部署 | 增加 site 服务，1Panel 反代切到 8090 |
 | 账号中心仍有旧导航 | 旧 JAR / Account theme 未设置 | 更新 1.0.7，设置 Account theme=`seezn-id` |
 | 没有头像/退出登录 | 旧 JAR | 1.0.4+ 才有自定义用户菜单 |
 | 语言按钮白底白字 | 旧 CSS | 更新 1.0.4+，强制刷新 |
@@ -545,7 +572,7 @@ environment:
 
 ---
 
-## 8. 升级检查清单
+## 9. 升级检查清单
 
 - [ ] 已确认 Keycloak 版本 26.8.x；
 - [ ] 下载的是 `all-other-versions.jar`；
@@ -555,14 +582,14 @@ environment:
 - [ ] 已重建容器，不是只 restart；
 - [ ] Login theme 和 Account theme 都是 `seezn-id`；
 - [ ] 无痕窗口验证账号中心；
-- [ ] `/terms`、`/privacy` 返回 200；
+- [ ] `/terms.html`、`/privacy.html` 返回 200；
 - [ ] 未知路径返回 SeeZn 404；
 - [ ] 旧 JAR 已备份，可回滚；
 - [ ] Postgres 数据卷有备份。
 
 ---
 
-## 9. 常用命令速查
+## 10. 常用命令速查
 
 ```bash
 # 编排目录
@@ -596,7 +623,7 @@ curl -s -o /dev/null -w '%{http_code}\n' https://auth.liseezn.top/this-does-not-
 
 ---
 
-## 10. 相关文件
+## 11. 相关文件
 
 - 主题发布：https://github.com/liseezn/seezn-id-keycloakify/releases
 - 部署手册：`docs/DEPLOYMENT.md`
