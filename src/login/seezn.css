@@ -347,6 +347,11 @@ html.login-pf body.seezn-body {
     align-items: stretch;
 }
 
+.sz-form-actions > * {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
 .sz-social {
     margin-top: 26px;
 }

@@ -19,6 +19,7 @@ import { Button } from "../../shared/@patternfly/react-core";
 import { ExternalLinkSquareAltIcon } from "../../shared/@patternfly/react-icons";
 
 import { AccountEnvironment } from "..";
+import { PageNav } from "./PageNav";
 
 import style from "./header.module.css";
 
@@ -70,6 +71,8 @@ export const Header = () => {
                 <a className="sz-account-brand" href={indexHref} aria-label="SeeZn ID">
                     <img src={logoSvgUrl} alt="SeeZn ID" className={style.brand} />
                 </a>
+
+                <PageNav />
 
                 <div className="sz-account-header-actions">
                     <ReferrerLink />

@@ -1,4 +1,4 @@
-import Link from "@mui/material/Link";
+import Button from "@mui/material/Button";
 import type { PageProps } from "keycloakify/login/pages/PageProps";
 import type { KcContext } from "../KcContext";
 import type { I18n } from "../i18n";
@@ -8,7 +8,8 @@ type Props = PageProps<Extract<KcContext, { pageId: "login-page-expired.ftl" }>,
 export default function PageExpiredPage(props: Props) {
     const { kcContext, i18n, doUseDefaultCss, Template, classes } = props;
     const { url } = kcContext;
-    const { msg } = i18n;
+    const { msg, currentLanguage } = i18n;
+    const zh = (currentLanguage.languageTag || "").toLowerCase().startsWith("zh");
 
     return (
         <Template
@@ -19,17 +20,30 @@ export default function PageExpiredPage(props: Props) {
             headerNode={msg("pageExpiredTitle")}
         >
             <p id="instruction1" className="sz-instruction">
-                {msg("pageExpiredMsg1")}{" "}
-                <Link id="loginRestartLink" href={url.loginRestartFlowUrl}>
-                    {msg("doClickHere")}
-                </Link>{" "}
-                .
-                <br />
-                {msg("pageExpiredMsg2")}{" "}
-                <Link id="loginContinueLink" href={url.loginAction}>
-                    {msg("doClickHere")}
-                </Link>{" "}
-                .
+                {msg("pageExpiredMsg1")}
+            </p>
+
+            <div className="sz-form-actions">
+                <Button
+                    id="loginRestartLink"
+                    variant="contained"
+                    size="large"
+                    href={url.loginRestartFlowUrl}
+                >
+                    {zh ? "重新开始登录" : "Restart sign-in"}
+                </Button>
+                <Button
+                    id="loginContinueLink"
+                    variant="outlined"
+                    size="large"
+                    href={url.loginAction}
+                >
+                    {zh ? "继续登录" : "Continue sign-in"}
+                </Button>
+            </div>
+
+            <p className="sz-instruction sz-muted">
+                {msg("pageExpiredMsg2")}
             </p>
         </Template>
     );

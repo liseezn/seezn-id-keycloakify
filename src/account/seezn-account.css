@@ -66,7 +66,7 @@ body {
     padding: 10px 24px;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
 }
 
 .sz-account-brand {
@@ -187,23 +187,21 @@ body {
     display: none !important;
 }
 
-/* ---------- horizontal navigation ---------- */
+/* ---------- horizontal navigation (inline, one row) ---------- */
 
 .sz-account-nav {
-    position: sticky;
-    top: 60px;
-    z-index: 29;
-    border-bottom: 1px solid var(--sz-border);
-    background: color-mix(in srgb, var(--sz-bg) 82%, transparent);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    backdrop-filter: saturate(180%) blur(20px);
+    flex: 1 1 auto;
+    min-width: 0;
+    position: static;
+    border: 0;
+    background: transparent;
 }
 
 .sz-account-nav-inner {
     display: flex;
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 8px 24px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
     align-items: center;
     gap: 8px;
 }
@@ -225,9 +223,12 @@ body {
 
 .sz-account-nav-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -236,9 +237,9 @@ body {
 .sz-account-nav-item {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    min-height: 38px;
-    padding: 8px 14px;
+    gap: 7px;
+    min-height: 36px;
+    padding: 7px 11px;
     border: 1px solid transparent;
     border-radius: 999px;
     background: transparent;
@@ -598,9 +599,19 @@ option {
 /* ---------- responsive ---------- */
 
 @media (max-width: 900px) {
-    .sz-account-nav-inner {
+    .sz-account-header-inner {
         flex-wrap: wrap;
         padding: 10px 16px;
+    }
+
+    .sz-account-nav {
+        flex: 1 1 100%;
+        order: 3;
+    }
+
+    .sz-account-nav-inner {
+        flex-wrap: wrap;
+        padding: 0;
     }
 
     .sz-account-nav-toggle {
@@ -661,7 +672,8 @@ option {
     }
 
     .sz-account-nav {
-        top: 56px;
+        flex: 1 1 100%;
+        order: 3;
     }
 
     .sz-account-user-name {

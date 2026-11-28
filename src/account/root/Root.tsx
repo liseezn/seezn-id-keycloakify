@@ -17,7 +17,7 @@ import { type AccountEnvironment } from "..";
 import { usePromise } from "../utils/usePromise";
 import { AccountErrorPage } from "./AccountErrorPage";
 import { Header } from "./Header";
-import { MenuItem, PageNav } from "./PageNav";
+import { MenuItem } from "./PageNav";
 import { routes } from "../routes";
 
 function mapRoutes(
@@ -54,7 +54,6 @@ function AccountLayout() {
     return (
         <div className="sz-account-shell">
             <Header />
-            <PageNav />
             <main id="sz-account-main" className="sz-account-main">
                 <Suspense fallback={<Spinner />}>
                     <Outlet />

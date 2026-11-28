@@ -1,6 +1,6 @@
 # SeeZn ID 主题：1Panel 安装、更新与运维教程
 
-适用：Keycloak 26.8.x + SeeZn ID 主题 **1.0.7** + 1Panel Docker 编排部署。
+适用：Keycloak 26.8.x + SeeZn ID 主题 **1.0.8** + 1Panel Docker 编排部署。
 
 > 本文覆盖四件事：
 >
@@ -55,7 +55,7 @@ ls -la
 
 ## 2. 首次安装主题
 
-### 2.1 下载 1.0.7 JAR
+### 2.1 下载 1.0.8 JAR
 
 Keycloak 26.8.x 使用：
 
@@ -68,13 +68,13 @@ cd "$(docker inspect keycloak \
   --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}}')"
 
 curl -fL -o seezn-id-theme.jar \
-  https://github.com/liseezn/seezn-id-keycloakify/releases/download/v1.0.7/keycloak-theme-for-kc-all-other-versions.jar
+  https://github.com/liseezn/seezn-id-keycloakify/releases/download/v1.0.8/keycloak-theme-for-kc-all-other-versions.jar
 
 chmod 644 seezn-id-theme.jar
 sha256sum seezn-id-theme.jar
 ```
 
-1.0.7 的 SHA256：
+1.0.8 的 SHA256：
 
 ```text
 c18063f925e363c1e5150c7dc8ae697e8095765f7de901ea4f39df01e3354d47
@@ -217,7 +217,7 @@ cp -a docker-compose.yml "backup/docker-compose-$(date +%Y%m%d-%H%M).yml"
 
 ```bash
 curl -fL -o seezn-id-theme.jar.new \
-  https://github.com/liseezn/seezn-id-keycloakify/releases/download/v1.0.7/keycloak-theme-for-kc-all-other-versions.jar
+  https://github.com/liseezn/seezn-id-keycloakify/releases/download/v1.0.8/keycloak-theme-for-kc-all-other-versions.jar
 
 sha256sum seezn-id-theme.jar.new
 mv seezn-id-theme.jar.new seezn-id-theme.jar
@@ -272,14 +272,14 @@ Keycloak 只提供认证页、账号中心、管理后台和主题资源，**不
 cd /opt
 git clone https://github.com/liseezn/seezn-id-keycloakify.git
 cd seezn-id-keycloakify
-docker build -f docker/Dockerfile.site -t seezn-id/site:1.0.7 .
+docker build -f docker/Dockerfile.site -t seezn-id/site:1.0.8 .
 ```
 
 在 Keycloak 的同一个 1Panel 编排项目里增加：
 
 ```yaml
   site:
-    image: seezn-id/site:1.0.7
+    image: seezn-id/site:1.0.8
     restart: unless-stopped
     depends_on:
       - keycloak
@@ -357,7 +357,7 @@ curl -s -o /dev/null -w '%{http_code} /realms/seezn/\n' https://auth.liseezn.top
 
 ## 5. 管理员后台主题
 
-1.0.7 的 JAR 同时包含 `admin` 类型。启用后，管理员后台使用 SeeZn 品牌界面。
+1.0.8 的 JAR 同时包含 `admin` 类型。启用后，管理员后台使用 SeeZn 品牌界面。
 
 ### 5.1 选择 Admin theme
 
@@ -374,8 +374,8 @@ curl -s -o /dev/null -w '%{http_code} /realms/seezn/\n' https://auth.liseezn.top
 
 ### 5.2 版本号在哪里
 
-- 管理后台右上角显示：`SeeZn ID v1.0.7`；
-- **Realm settings → Themes** 的主题下拉项会带 `SeeZn ID v1.0.7` 描述；
+- 管理后台右上角显示：`SeeZn ID v1.0.8`；
+- **Realm settings → Themes** 的主题下拉项会带 `SeeZn ID v1.0.8` 描述；
 - 主题版本由 `package.json` 自动注入，升级 JAR 后无需手改。
 
 ### 5.3 管理员 404
@@ -561,7 +561,7 @@ environment:
 | 下拉框没有 `seezn-id` | JAR 是目录、未重建、用错版本 | 查 `docker inspect` Mounts 和 `ls -lh`，重建容器 |
 | 页面还是旧主题 | JAR 未替换、浏览器缓存 | 无痕窗口，确认容器内 JAR 时间/大小 |
 | `/terms.html` `/privacy.html` 404 | 公共站点未部署 | 增加 site 服务，1Panel 反代切到 8090 |
-| 账号中心仍有旧导航 | 旧 JAR / Account theme 未设置 | 更新 1.0.7，设置 Account theme=`seezn-id` |
+| 账号中心仍有旧导航 | 旧 JAR / Account theme 未设置 | 更新 1.0.8，设置 Account theme=`seezn-id` |
 | 没有头像/退出登录 | 旧 JAR | 1.0.4+ 才有自定义用户菜单 |
 | 语言按钮白底白字 | 旧 CSS | 更新 1.0.4+，强制刷新 |
 | 确定/取消按钮上下排列 | 旧 CSS | 更新 1.0.3+ |
