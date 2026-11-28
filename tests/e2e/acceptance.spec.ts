@@ -248,6 +248,28 @@ test.describe("authentication", () => {
     });
 });
 
+test.describe("admin console", () => {
+    const ADMIN_USER = process.env.KC_BOOTSTRAP_ADMIN_USERNAME ?? "admin";
+    const ADMIN_PASSWORD = process.env.KC_BOOTSTRAP_ADMIN_PASSWORD ?? "admin";
+
+    test("admin login and console use the SeeZn theme and version", async ({ page }) => {
+        test.setTimeout(150_000);
+
+        await page.goto(`${KC}/admin/`);
+        await expect(page.locator("#kc-header-wrapper")).toContainText("SeeZn ID");
+
+        await page.fill("#username", ADMIN_USER);
+        await page.fill("#password", ADMIN_PASSWORD);
+        await page.click("[data-testid=login-submit]");
+
+        await expect(page.locator(".keycloak__pageheader_brand")).toBeVisible({
+            timeout: 60_000
+        });
+        await expect(page).toHaveTitle(/SeeZn ID/);
+        await expect(page.locator(".sz-admin-version-label")).toContainText(/SeeZn ID v/);
+    });
+});
+
 test.describe("public pages", () => {
     const SITE = "http://127.0.0.1:5174";
 

@@ -52,9 +52,11 @@ jobs:
           unzip -p "$JAR" META-INF/keycloak-themes.json
           unzip -p "$JAR" META-INF/keycloak-themes.json | grep -q '"login"'
           unzip -p "$JAR" META-INF/keycloak-themes.json | grep -q '"account"'
+          unzip -p "$JAR" META-INF/keycloak-themes.json | grep -q '"admin"'
           unzip -l "$JAR" | grep -q 'theme/seezn-id/account/'
+          unzip -l "$JAR" | grep -q 'theme/seezn-id/admin/'
           unzip -l "$JAR" | grep -q 'theme/seezn-id/login/'
-          echo "theme types OK: login + account"
+          echo "theme types OK: login + account + admin"
 
       - name: Upload theme JAR
         uses: actions/upload-artifact@v4

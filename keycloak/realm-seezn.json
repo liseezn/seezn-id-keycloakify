@@ -5,6 +5,7 @@
   "sslRequired": "external",
   "loginTheme": "seezn-id",
   "accountTheme": "seezn-id",
+  "adminTheme": "seezn-id",
   "internationalizationEnabled": true,
   "supportedLocales": [
     "en",

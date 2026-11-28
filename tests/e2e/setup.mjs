@@ -27,8 +27,8 @@ async function adminToken() {
     return (await response.json()).access_token;
 }
 
-async function api(token, path, init = {}) {
-    const response = await fetch(`${KC_BASE}/admin/realms/${REALM}${path}`, {
+async function apiRealm(token, realm, path, init = {}) {
+    const response = await fetch(`${KC_BASE}/admin/realms/${realm}${path}`, {
         ...init,
         headers: {
             Authorization: `Bearer ${token}`,
@@ -40,6 +40,10 @@ async function api(token, path, init = {}) {
         throw new Error(`${init.method ?? "GET"} ${path} -> ${response.status}: ${await response.text()}`);
     }
     return response;
+}
+
+async function api(token, path, init = {}) {
+    return apiRealm(token, REALM, path, init);
 }
 
 async function deleteUser(token, username) {
@@ -114,6 +118,15 @@ export default async function globalSetup() {
 
     const token = await adminToken();
 
+    // Admin Console (master realm) uses the master realm's login/admin themes.
+    // Apply SeeZn ID so the admin login page and console UI are covered.
+    const masterResponse = await apiRealm(token, "master", "");
+    const master = await masterResponse.json();
+    await apiRealm(token, "master", "", {
+        method: "PUT",
+        body: JSON.stringify({ ...master, loginTheme: "seezn-id", adminTheme: "seezn-id" })
+    });
+
     const realmResponse = await api(token, "");
     const realm = await realmResponse.json();
 
@@ -123,6 +136,9 @@ export default async function globalSetup() {
     }
     if (realm.accountTheme !== "seezn-id") {
         problems.push(`accountTheme is "${realm.accountTheme}", expected "seezn-id"`);
+    }
+    if (realm.adminTheme !== "seezn-id") {
+        problems.push(`adminTheme is "${realm.adminTheme}", expected "seezn-id"`);
     }
     for (const locale of ["en", "zh-CN"]) {
         if (!(realm.supportedLocales ?? []).includes(locale)) {

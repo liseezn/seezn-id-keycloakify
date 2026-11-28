@@ -1,0 +1,115 @@
+@import "../../public-site/assets/tokens.css";
+
+/* SeeZn ID Admin Console — brand tokens and light-touch overrides. */
+
+:root {
+    --pf-v5-global--FontFamily--text: var(--sz-font);
+    --pf-v5-global--FontFamily--heading--font-family: var(--sz-font);
+    --pf-v5-global--primary-color--100: var(--sz-accent);
+    --pf-v5-global--primary-color--200: var(--sz-accent-strong);
+    --pf-v5-global--link--Color: var(--sz-accent);
+    --pf-v5-global--link--Color--hover: var(--sz-accent-strong);
+    --pf-v5-global--BackgroundColor--100: var(--sz-bg);
+    --pf-v5-global--BackgroundColor--200: var(--sz-muted-bg);
+    --pf-v5-global--Color--100: var(--sz-text);
+    --pf-v5-global--Color--200: var(--sz-muted);
+    --pf-v5-global--BorderColor--100: var(--sz-border);
+    --pf-v5-global--BorderColor--200: var(--sz-border);
+}
+
+html,
+body,
+#root {
+    background: var(--sz-bg);
+    color: var(--sz-text);
+    font-family: var(--sz-font);
+}
+
+body {
+    margin: 0;
+}
+
+.keycloak__pageheader_brand {
+    height: 28px;
+    width: auto;
+}
+
+.pf-v5-c-masthead {
+    border-bottom: 1px solid var(--sz-border);
+    background: color-mix(in srgb, var(--sz-bg) 86%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+}
+
+.pf-v5-c-page__sidebar {
+    border-right: 1px solid var(--sz-border);
+    background: var(--sz-bg);
+}
+
+.pf-v5-c-page__main,
+.pf-v5-c-page__main-section {
+    background: var(--sz-bg);
+}
+
+.pf-v5-c-button.pf-m-primary {
+    border-color: var(--sz-accent);
+    background: var(--sz-accent);
+    color: #ffffff;
+}
+
+.pf-v5-c-button.pf-m-primary:hover {
+    border-color: var(--sz-accent-strong);
+    background: var(--sz-accent-strong);
+}
+
+.sz-admin-version-label {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.sz-admin-theme-version {
+    margin: 0 0 16px;
+    color: var(--sz-muted);
+    font-size: 0.875rem;
+}
+
+.sz-admin-notfound {
+    max-width: 560px;
+    margin: 48px auto;
+    padding: 0 24px;
+    text-align: center;
+}
+
+.sz-admin-notfound-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    min-height: 64px;
+    margin-bottom: 16px;
+    border: 1px solid var(--sz-border);
+    border-radius: 18px;
+    background: var(--sz-muted-bg);
+    color: var(--sz-accent);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.sz-admin-notfound h1 {
+    margin: 0 0 10px;
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+}
+
+.sz-admin-notfound p {
+    margin: 0 auto 24px;
+    max-width: 460px;
+    color: var(--sz-muted);
+    line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+    .sz-admin-version-label {
+        display: none;
+    }
+}

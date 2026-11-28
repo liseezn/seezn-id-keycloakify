@@ -1,6 +1,6 @@
 # SeeZn ID 主题：1Panel 安装、更新与运维教程
 
-适用：Keycloak 26.8.x + SeeZn ID 主题 **1.0.6** + 1Panel Docker 编排部署。
+适用：Keycloak 26.8.x + SeeZn ID 主题 **1.0.7** + 1Panel Docker 编排部署。
 
 > 本文覆盖四件事：
 >
@@ -55,7 +55,7 @@ ls -la
 
 ## 2. 首次安装主题
 
-### 2.1 下载 1.0.6 JAR
+### 2.1 下载 1.0.7 JAR
 
 Keycloak 26.8.x 使用：
 
@@ -68,13 +68,13 @@ cd "$(docker inspect keycloak \
   --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}}')"
 
 curl -fL -o seezn-id-theme.jar \
-  https://github.com/liseezn/seezn-id-keycloakify/releases/download/v1.0.6/keycloak-theme-for-kc-all-other-versions.jar
+  https://github.com/liseezn/seezn-id-keycloakify/releases/download/v1.0.7/keycloak-theme-for-kc-all-other-versions.jar
 
 chmod 644 seezn-id-theme.jar
 sha256sum seezn-id-theme.jar
 ```
 
-1.0.6 的 SHA256：
+1.0.7 的 SHA256：
 
 ```text
 e724429455545142c997a13f20ce2658912dedfc5b62ae5b3cf73ef9b3e15aa4
@@ -272,14 +272,14 @@ Keycloak 只提供认证页、账号中心、管理后台和主题资源，**不
 cd /opt
 git clone https://github.com/liseezn/seezn-id-keycloakify.git
 cd seezn-id-keycloakify
-docker build -f docker/Dockerfile.site -t seezn-id/site:1.0.6 .
+docker build -f docker/Dockerfile.site -t seezn-id/site:1.0.7 .
 ```
 
 在 Keycloak 的同一个 1Panel 编排项目里增加：
 
 ```yaml
   site:
-    image: seezn-id/site:1.0.6
+    image: seezn-id/site:1.0.7
     restart: unless-stopped
     depends_on:
       - keycloak
@@ -534,7 +534,7 @@ environment:
 | 下拉框没有 `seezn-id` | JAR 是目录、未重建、用错版本 | 查 `docker inspect` Mounts 和 `ls -lh`，重建容器 |
 | 页面还是旧主题 | JAR 未替换、浏览器缓存 | 无痕窗口，确认容器内 JAR 时间/大小 |
 | `/terms` `/privacy` 404 | 公共站点未部署 | 增加 site 服务，1Panel 反代切到 8090 |
-| 账号中心仍有旧导航 | 旧 JAR / Account theme 未设置 | 更新 1.0.6，设置 Account theme=`seezn-id` |
+| 账号中心仍有旧导航 | 旧 JAR / Account theme 未设置 | 更新 1.0.7，设置 Account theme=`seezn-id` |
 | 没有头像/退出登录 | 旧 JAR | 1.0.4+ 才有自定义用户菜单 |
 | 语言按钮白底白字 | 旧 CSS | 更新 1.0.4+，强制刷新 |
 | 确定/取消按钮上下排列 | 旧 CSS | 更新 1.0.3+ |
