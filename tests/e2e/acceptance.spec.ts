@@ -94,8 +94,8 @@ test.describe("authentication", () => {
         await expect(page.locator(".sz-account-user")).toBeVisible();
         await expect(page.locator(".sz-account-nav")).toBeVisible();
         await expect(page.locator(".sz-account-footer")).toContainText("2026 SeeZn ID");
-        await expect(page.locator('.sz-account-footer a[href="/privacy"]')).toBeVisible();
-        await expect(page.locator('.sz-account-footer a[href="/terms"]')).toBeVisible();
+        await expect(page.locator('.sz-account-footer a[href="/privacy.html"]')).toBeVisible();
+        await expect(page.locator('.sz-account-footer a[href="/terms.html"]')).toBeVisible();
         await expect(page.locator('.sz-account-footer a[href="/"]')).toBeVisible();
         await expect(page.locator('.sz-account-nav a[href="/"]')).toBeVisible();
         expect(await page.locator(".sz-account-nav-item").count()).toBeGreaterThan(2);
@@ -256,13 +256,13 @@ test.describe("public pages", () => {
         await expect(page).toHaveTitle(/SeeZn ID/);
         await expect(page.locator(".sz-header")).toBeVisible();
 
-        await page.goto(`${SITE}/terms`, { waitUntil: "domcontentloaded" });
+        await page.goto(`${SITE}/terms.html`, { waitUntil: "domcontentloaded" });
         await expect(page.locator('main div[lang="en"] h2')).toHaveCount(16);
         await expect(page.locator('main div[lang="zh"] h2')).toHaveCount(16);
         await page.locator('.sz-lang button[data-l="zh"]').click();
         await expect(page.locator("main h1").first()).toHaveText("服务条款");
 
-        await page.goto(`${SITE}/privacy`, { waitUntil: "domcontentloaded" });
+        await page.goto(`${SITE}/privacy.html`, { waitUntil: "domcontentloaded" });
         await expect(page.locator('main div[lang="en"] h2')).toHaveCount(16);
         await expect(page.locator('main div[lang="zh"] h2')).toHaveCount(16);
         expect(await page.locator("main table").count()).toBeGreaterThanOrEqual(4);
@@ -273,9 +273,9 @@ test.describe("public pages", () => {
         ).toBeLessThanOrEqual(0);
     });
 
-    test("clean urls, legacy html redirects and the 404 page", async ({ page }) => {
-        await page.goto(`${SITE}/terms.html`, { waitUntil: "domcontentloaded" });
-        await expect(page).toHaveURL(`${SITE}/terms`);
+    test("legal html urls, clean aliases and the 404 page", async ({ page }) => {
+        await page.goto(`${SITE}/terms`, { waitUntil: "domcontentloaded" });
+        await expect(page).toHaveURL(`${SITE}/terms.html`);
         await expect(page.locator("main h1").first()).toHaveText("服务条款");
 
         const missing = await page.goto(`${SITE}/this-page-does-not-exist`, {
@@ -284,7 +284,7 @@ test.describe("public pages", () => {
         expect(missing?.status()).toBe(404);
         await expect(page.locator("main h1")).toContainText(/页面不存在|Page not found/);
         await expect(page.locator('main a[href="/"]').first()).toBeVisible();
-        await expect(page.locator('main a[href="/terms"]').first()).toBeVisible();
+        await expect(page.locator('main a[href="/terms.html"]').first()).toBeVisible();
 
         await page.locator('.sz-lang button[data-l="zh"]').click();
         await expect(page.locator('main h1 [lang="zh"]')).toBeVisible();

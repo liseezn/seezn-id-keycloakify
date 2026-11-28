@@ -54,7 +54,7 @@ http_get() { # url out-file -> prints status code
 # ---------------------------------------------------------------------------
 section "Public site pages (${SITE_URL})"
 # ---------------------------------------------------------------------------
-for path in "/" "/terms" "/privacy"; do
+for path in "/" "/terms.html" "/privacy.html"; do
     body="$TMP_DIR/page$(printf '%s' "$path" | tr '/.' '__').html"
     code="$(http_get "${SITE_URL}${path}" "$body")"
     if [[ "$code" == "200" ]] && grep -qi '<html' "$body"; then
@@ -73,8 +73,8 @@ else
     fail "GET unknown path -> ${code} (expected 404 with SeeZn 404 page)"
 fi
 
-# Legacy .html links should redirect to canonical clean URLs.
-for pair in "/terms.html:/terms" "/privacy.html:/privacy" "/index.html:/"; do
+# Clean aliases redirect to the canonical .html URLs.
+for pair in "/terms:/terms.html" "/privacy:/privacy.html" "/index.html:/"; do
     old="${pair%%:*}"; new="${pair##*:}"
     location="$("${CURL[@]}" -s -o /dev/null -D - "${SITE_URL}${old}" | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r')"
     if [[ "$location" == *"${new}"* ]]; then

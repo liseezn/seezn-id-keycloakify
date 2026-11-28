@@ -64,8 +64,8 @@ function AccountLayout() {
                 <span>© 2026 SeeZn ID</span>
                 <nav aria-label="SeeZn ID">
                     <a href="/">{zh ? "首页" : "Home"}</a>
-                    <a href="/privacy">{zh ? "隐私政策" : "Privacy"}</a>
-                    <a href="/terms">{zh ? "服务条款" : "Terms"}</a>
+                    <a href="/privacy.html">{zh ? "隐私政策" : "Privacy"}</a>
+                    <a href="/terms.html">{zh ? "服务条款" : "Terms"}</a>
                 </nav>
             </footer>
         </div>

@@ -3,8 +3,8 @@
  *
  * The production stack serves the same files through docker/nginx.conf:
  *   / -> index.html, /terms -> terms.html, /privacy -> privacy.html
+ *   /terms and /privacy alias -> 301 to the .html URL
  *   unknown paths -> 404.html with HTTP 404
- *   *.html entry points -> 301 to the clean URL
  */
 import http from "node:http";
 import { readFile } from "node:fs/promises";
@@ -19,7 +19,10 @@ const port = Number(process.env.PORT ?? 5174);
 const CLEAN = new Map([
     ["/", "index.html"],
     ["/terms", "terms.html"],
-    ["/privacy", "privacy.html"]
+    ["/privacy", "privacy.html"],
+    ["/terms.html", "terms.html"],
+    ["/privacy.html", "privacy.html"],
+    ["/index.html", "index.html"]
 ]);
 
 const MIME = {
@@ -58,14 +61,16 @@ const server = http.createServer(async (req, res) => {
         return send(res, 400, "Bad request");
     }
 
-    // Old .html entry points: 301 to the canonical path, like nginx.
-    if (pathname.endsWith(".html")) {
-        const clean = pathname === "/index.html" ? "/" : pathname.slice(0, -5);
-        if (CLEAN.has(clean)) {
-            res.writeHead(301, { Location: `${clean}${url.search}` });
-            res.end();
-            return;
-        }
+    // Clean aliases redirect to the explicit .html entry points.
+    if (pathname === "/terms" || pathname === "/privacy") {
+        res.writeHead(301, { Location: `${pathname}.html${url.search}` });
+        res.end();
+        return;
+    }
+    if (pathname === "/index.html") {
+        res.writeHead(301, { Location: `/${url.search}` });
+        res.end();
+        return;
     }
 
     const relative = CLEAN.get(pathname) ?? pathname.replace(/^\/+/, "");
