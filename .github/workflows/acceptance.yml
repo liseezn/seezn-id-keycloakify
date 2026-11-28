@@ -58,7 +58,6 @@ jobs:
           docker run -d --name seezn-keycloak --network host \
             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
             -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
-            -e KC_SPI_THEME_DEFAULT=seezn-id \
             -v "$PWD/keycloak/realm-seezn.json:/opt/keycloak/data/import/realm-seezn.json:ro" \
             -v "$PWD/$THEME_JAR:/opt/keycloak/providers/seezn-id.jar:ro" \
             quay.io/keycloak/keycloak:26.8.2 start-dev --http-port=8100 --import-realm
@@ -76,6 +75,21 @@ jobs:
             --user admin --password admin
           docker exec seezn-keycloak /opt/keycloak/bin/kcadm.sh \
             update realms/master -s loginTheme=seezn-id -s adminTheme=seezn-id
+
+          CLIENT_ID="$(docker exec seezn-keycloak /opt/keycloak/bin/kcadm.sh \
+            get clients -r master -q clientId=security-admin-console \
+            --fields id --format csv --noquotes | tail -n 1)"
+          docker exec seezn-keycloak /opt/keycloak/bin/kcadm.sh \
+            update "clients/${CLIENT_ID}" -r master \
+            -s attributes.login_theme=seezn-id
+
+          docker restart seezn-keycloak
+          for i in $(seq 1 90); do
+            curl -sf http://127.0.0.1:8100/realms/master/ > /dev/null && exit 0
+            sleep 2
+          done
+          docker logs seezn-keycloak
+          exit 1
 
       - name: Run acceptance suite
         run: |
