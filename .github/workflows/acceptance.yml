@@ -58,6 +58,7 @@ jobs:
           docker run -d --name seezn-keycloak --network host \
             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
             -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -e KC_SPI_THEME_DEFAULT=seezn-id \
             -v "$PWD/keycloak/realm-seezn.json:/opt/keycloak/data/import/realm-seezn.json:ro" \
             -v "$PWD/$THEME_JAR:/opt/keycloak/providers/seezn-id.jar:ro" \
             quay.io/keycloak/keycloak:26.8.2 start-dev --http-port=8100 --import-realm
