@@ -10,6 +10,7 @@
 import { useEnvironment, KeycloakContext } from "../../shared/keycloak-ui-shared";
 import { Spinner } from "../../shared/@patternfly/react-core";
 import { Suspense, useState } from "react";
+import { FileText, Home, Scale } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { createBrowserRouter, Outlet, RouteObject, RouterProvider } from "react-router-dom";
 import fetchContentJson from "../content/fetchContent";
@@ -62,9 +63,18 @@ function AccountLayout() {
             <footer className="sz-account-footer">
                 <span>© 2026 SeeZn ID</span>
                 <nav aria-label="SeeZn ID">
-                    <a href="/">{zh ? "首页" : "Home"}</a>
-                    <a href="/privacy.html">{zh ? "隐私政策" : "Privacy"}</a>
-                    <a href="/terms.html">{zh ? "服务条款" : "Terms"}</a>
+                    <a href="/">
+                        <Home size={13} aria-hidden="true" />
+                        {zh ? "首页" : "Home"}
+                    </a>
+                    <a href="/privacy.html">
+                        <FileText size={13} aria-hidden="true" />
+                        {zh ? "隐私政策" : "Privacy"}
+                    </a>
+                    <a href="/terms.html">
+                        <Scale size={13} aria-hidden="true" />
+                        {zh ? "服务条款" : "Terms"}
+                    </a>
                 </nav>
             </footer>
         </div>

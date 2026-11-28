@@ -46,6 +46,16 @@ body {
     background: var(--sz-bg);
 }
 
+.keycloak__page_nav__nav .pf-v5-c-nav__link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.keycloak__page_nav__nav .pf-v5-c-nav__link svg {
+    flex: none;
+}
+
 .pf-v5-c-page__main,
 .pf-v5-c-page__main-section {
     background: var(--sz-bg);
@@ -84,6 +94,7 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 7px;
     min-width: 64px;
     min-height: 64px;
     margin-bottom: 16px;
@@ -99,6 +110,12 @@ body {
     margin: 0 0 10px;
     font-size: 1.75rem;
     letter-spacing: -0.02em;
+}
+
+.sz-admin-notfound .pf-v5-c-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
 }
 
 .sz-admin-notfound p {

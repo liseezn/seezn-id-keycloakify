@@ -7,6 +7,7 @@
 // @ts-nocheck
 
 import { useTranslation } from "react-i18next";
+import { FileQuestion, Home } from "lucide-react";
 
 export const PageNotFoundSection = () => {
     const { i18n } = useTranslation();
@@ -14,7 +15,10 @@ export const PageNotFoundSection = () => {
 
     return (
         <div className="sz-admin-notfound">
-            <span className="sz-admin-notfound-code">404</span>
+            <span className="sz-admin-notfound-code">
+                <FileQuestion size={22} aria-hidden="true" />
+                404
+            </span>
             <h1>{zh ? "页面未找到" : "Page not found"}</h1>
             <p>
                 {zh
@@ -22,6 +26,7 @@ export const PageNotFoundSection = () => {
                     : "We are sorry, the administration page you requested could not be found or has moved."}
             </p>
             <a className="pf-v5-c-button pf-m-primary" href="#/">
+                <Home size={16} aria-hidden="true" />
                 {zh ? "返回管理后台" : "Back to admin console"}
             </a>
         </div>

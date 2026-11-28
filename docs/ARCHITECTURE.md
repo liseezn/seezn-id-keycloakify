@@ -16,7 +16,7 @@
 | UI 库 | MUI v6（`@mui/material` + Emotion），图标 `lucide-react` |
 | 字体 | `@fontsource/inter`（自托管，400/500/600/700）；CJK 使用系统字体回退 |
 | 主题名 | `seezn-id`（JAR 内注册；types = `login` + `account`） |
-| 主题版本 | `1.0.8`（package.json version 驱动） |
+| 主题版本 | `1.0.9`（package.json version 驱动） |
 | 构建产物 | `dist_keycloak/keycloak-theme-for-kc-*.jar`（Keycloakify 11 默认双 JAR） |
 | 账号中心 | Keycloakify Single-Page Account UI（`src/account/**`，外壳自有、其余上游生成） |
 | 公共站点 | `public-site/`：`index.html`、`terms.html`、`privacy.html`、`404.html`；对外 clean URL `/`、`/terms`、`/privacy` |

@@ -8,10 +8,12 @@
 // @ts-nocheck
 
 import { useTranslation } from "react-i18next";
+import { ArrowLeft, FileQuestion, Home } from "lucide-react";
 
 import logoSvgUrl from "../assets/logo.svg";
 import { useEnvironment } from "../../shared/keycloak-ui-shared";
 import { type AccountEnvironment } from "..";
+import { PageNav } from "./PageNav";
 
 type AccountErrorPageProps = {
     kind?: "notFound" | "error";
@@ -26,7 +28,10 @@ export function AccountErrorPage({ kind = "notFound", embedded = false }: Accoun
 
     const content = (
         <section className="sz-account-error" aria-live="polite">
-            <span className="sz-account-error-code">{notFound ? "404" : "!"}</span>
+            <span className="sz-account-error-code">
+                <FileQuestion size={22} aria-hidden="true" />
+                <span>{notFound ? "404" : "!"}</span>
+            </span>
             <h1>
                 {notFound
                     ? zh
@@ -47,9 +52,11 @@ export function AccountErrorPage({ kind = "notFound", embedded = false }: Accoun
             </p>
             <div className="sz-account-error-actions">
                 <a className="pf-v5-c-button pf-m-primary" href="/">
+                    <Home size={16} aria-hidden="true" />
                     {zh ? "返回首页" : "Back to home"}
                 </a>
                 <a className="pf-v5-c-button pf-m-secondary" href={environment.baseUrl}>
+                    <ArrowLeft size={16} aria-hidden="true" />
                     {zh ? "返回账户中心" : "Back to account"}
                 </a>
             </div>
@@ -69,6 +76,7 @@ export function AccountErrorPage({ kind = "notFound", embedded = false }: Accoun
                     </a>
                 </div>
             </div>
+            <PageNav />
 
             <main className="sz-account-main">
                 {content}

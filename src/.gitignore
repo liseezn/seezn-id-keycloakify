@@ -5,6 +5,7 @@
 # admin/index.css
 # admin/KcAdminUi.tsx
 # admin/PageHeader.tsx
+# admin/PageNav.tsx
 # admin/PageNotFoundSection.tsx
 # account/assets/content.ts
 # account/assets/favicon.svg
@@ -34,7 +35,6 @@
 /admin/KcPage.tsx
 /admin/page-nav.css
 /admin/PageHeaderClearCachesModal.tsx
-/admin/PageNav.tsx
 /admin/Root.tsx
 /admin/routes.tsx
 /admin/util.ts

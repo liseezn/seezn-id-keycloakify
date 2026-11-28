@@ -1,4 +1,5 @@
 import Button from "@mui/material/Button";
+import { LogIn, RotateCcw } from "lucide-react";
 import type { PageProps } from "keycloakify/login/pages/PageProps";
 import type { KcContext } from "../KcContext";
 import type { I18n } from "../i18n";
@@ -29,6 +30,7 @@ export default function PageExpiredPage(props: Props) {
                     variant="contained"
                     size="large"
                     href={url.loginRestartFlowUrl}
+                    startIcon={<RotateCcw size={18} />}
                 >
                     {zh ? "重新开始登录" : "Restart sign-in"}
                 </Button>
@@ -37,6 +39,7 @@ export default function PageExpiredPage(props: Props) {
                     variant="outlined"
                     size="large"
                     href={url.loginAction}
+                    startIcon={<LogIn size={18} />}
                 >
                     {zh ? "继续登录" : "Continue sign-in"}
                 </Button>
