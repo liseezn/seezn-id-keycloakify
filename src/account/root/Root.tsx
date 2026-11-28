@@ -7,14 +7,15 @@
 
 // @ts-nocheck
 
-import { ErrorPage, useAlerts, useEnvironment, KeycloakContext } from "../../shared/keycloak-ui-shared";
-import { AlertVariant, Spinner } from "../../shared/@patternfly/react-core";
-import { Suspense, useEffect, useState } from "react";
+import { useEnvironment, KeycloakContext } from "../../shared/keycloak-ui-shared";
+import { Spinner } from "../../shared/@patternfly/react-core";
+import { Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { createBrowserRouter, Navigate, Outlet, RouteObject, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouteObject, RouterProvider } from "react-router-dom";
 import fetchContentJson from "../content/fetchContent";
 import { type AccountEnvironment } from "..";
 import { usePromise } from "../utils/usePromise";
+import { AccountErrorPage } from "./AccountErrorPage";
 import { Header } from "./Header";
 import { MenuItem, PageNav } from "./PageNav";
 import { routes } from "../routes";
@@ -44,17 +45,6 @@ function mapRoutes(
         })
         .filter(item => !!item)
         .flat();
-}
-
-function CatchAllRedirect() {
-    const { t } = useTranslation();
-    const { addAlert } = useAlerts();
-
-    useEffect(() => {
-        addAlert(t("pageNotFound"), AlertVariant.warning);
-    }, [addAlert, t]);
-
-    return <Navigate to="." replace />;
 }
 
 function AccountLayout() {
@@ -93,10 +83,10 @@ export const Root = () => {
                 {
                     path: decodeURIComponent(new URL(context.environment.baseUrl).pathname),
                     element: <AccountLayout />,
-                    errorElement: <ErrorPage />,
+                    errorElement: <AccountErrorPage kind="error" />,
                     children: [
                         ...mapRoutes(context, content),
-                        { path: "*", element: <CatchAllRedirect /> }
+                        { path: "*", element: <AccountErrorPage kind="notFound" embedded /> }
                     ]
                 }
             ]);

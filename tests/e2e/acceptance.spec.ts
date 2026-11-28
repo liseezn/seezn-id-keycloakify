@@ -114,6 +114,20 @@ test.describe("authentication", () => {
         await page.screenshot({ path: `${SHOTS}/account-mobile-dark.png`, fullPage: true });
     });
 
+    test("account unknown route shows the branded 404 page", async ({ page }) => {
+        await stubCallback(page);
+        await startLogin(page, "alice");
+        await page.waitForTimeout(800);
+        await page.goto(`${KC}/realms/seezn/account/this-page-does-not-exist`);
+
+        await expect(page.locator(".sz-account-error")).toBeVisible();
+        await expect(page.locator(".sz-account-error h1")).toContainText(
+            /页面未找到|Page not found/
+        );
+        await expect(page.locator('.sz-account-error a[href="/"]')).toBeVisible();
+        await expect(page.locator('.sz-account-error a[href*="/account/"]')).toBeVisible();
+    });
+
     test("Google button starts the broker flow with the expected parameters", async ({ page }) => {
         await page.context().route("https://accounts.google.com/**", route =>
             route.fulfill({ status: 200, contentType: "text/html", body: "stub" })
