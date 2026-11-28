@@ -127,6 +127,24 @@ export default async function globalSetup() {
         body: JSON.stringify({ ...master, loginTheme: "seezn-id", adminTheme: "seezn-id" })
     });
 
+    // The admin console client can override the login theme via its
+    // login_theme attribute. Set it explicitly so /admin/ uses SeeZn ID.
+    const adminClients = await apiRealm(
+        token,
+        "master",
+        "/clients?clientId=security-admin-console"
+    );
+    const [adminClient] = await adminClients.json();
+    if (adminClient) {
+        await apiRealm(token, "master", `/clients/${adminClient.id}`, {
+            method: "PUT",
+            body: JSON.stringify({
+                ...adminClient,
+                attributes: { ...(adminClient.attributes ?? {}), login_theme: "seezn-id" }
+            })
+        });
+    }
+
     const realmResponse = await api(token, "");
     const realm = await realmResponse.json();
 
