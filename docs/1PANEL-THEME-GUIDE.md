@@ -77,7 +77,7 @@ sha256sum seezn-id-theme.jar
 1.0.6 的 SHA256：
 
 ```text
-待发布后更新
+e724429455545142c997a13f20ce2658912dedfc5b62ae5b3cf73ef9b3e15aa4
 ```
 
 检查是文件而不是目录：
