@@ -118,6 +118,18 @@ export default async function globalSetup() {
 
     const token = await adminToken();
 
+    const masterResponse = await apiRealm(token, "master", "");
+    const master = await masterResponse.json();
+    await apiRealm(token, "master", "", {
+        method: "PUT",
+        body: JSON.stringify({
+            ...master,
+            displayName: "SeeZn ID",
+            loginTheme: "seezn-id",
+            adminTheme: "seezn-id"
+        })
+    });
+
     const realmResponse = await api(token, "");
     const realm = await realmResponse.json();
 
