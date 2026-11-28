@@ -77,7 +77,7 @@ sha256sum seezn-id-theme.jar
 1.0.9 的 SHA256：
 
 ```text
-1b289b95c27ed1aba63c6f7ba64ca31645e49e2cb74cfc060898cbd6eefeb03f
+ecc162918d177bffc02304be4c062f7084c491aa9713e516e8ca8acc9c66c2fe
 ```
 
 检查是文件而不是目录：
